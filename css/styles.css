@@ -1,0 +1,333 @@
+/* ==========================================================================
+   CIRCULAR — Design Electronics for Repair, Reuse & Recovery
+   Challenge: IMX26-PS07 — CEDA-EPS
+   Style System: Warm Technical Minimal / Climate-Tech Product Design
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F3EFE7;
+  --bg-surface-tint: #EFF6EE;
+  
+  --text-forest: #0D2818;
+  --text-forest-muted: #3D4E44;
+  --text-forest-subtle: #687970;
+  
+  --brand-forest: #0D2818;
+  --brand-forest-deep: #07170E;
+  --brand-forest-light: #164027;
+  --brand-forest-border: #1E5033;
+  
+  --brand-lime: #B8F349;
+  --brand-lime-hover: #A5DF35;
+  --brand-lime-pale: #EBFCCE;
+  --brand-lime-deep: #166534;
+  
+  --brand-charcoal: #1E2522;
+  --border-subtle: #E4DFD5;
+  --border-card: #DAD4C8;
+  --border-dark: #0D2818;
+  
+  --accent-amber: #D97706;
+  --accent-amber-bg: #FEF3C7;
+  --accent-red: #DC2626;
+  --accent-red-bg: #FEE2E2;
+  --accent-blue: #0284C7;
+  --accent-blue-bg: #E0F2FE;
+  
+  --shadow-sm: 0 1px 2px rgba(13, 40, 24, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(13, 40, 24, 0.06), 0 2px 6px -1px rgba(13, 40, 24, 0.03);
+  --shadow-lg: 0 12px 24px -4px rgba(13, 40, 24, 0.08), 0 4px 8px -2px rgba(13, 40, 24, 0.04);
+  --shadow-lime: 0 8px 20px -4px rgba(184, 243, 73, 0.4);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Global Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-forest);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-forest);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Monospace telemetry tag utility */
+.font-mono-code {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+/* Subtle grid texture overlay for technical feel */
+.bg-tech-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(13, 40, 24, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(13, 40, 24, 0.03) 1px, transparent 1px);
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(13, 40, 24, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: #D4CEBF;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A8A190;
+}
+
+/* Technical Badges */
+.badge-tech {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-lime {
+  background-color: var(--brand-lime-pale);
+  color: var(--brand-lime-deep);
+  border: 1px solid rgba(184, 243, 73, 0.5);
+}
+
+.badge-forest {
+  background-color: var(--brand-forest);
+  color: var(--brand-lime);
+}
+
+.badge-neutral {
+  background-color: var(--bg-surface-alt);
+  color: var(--text-forest-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Card base system */
+.card-clean {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-clean:hover {
+  border-color: #B4ACA0;
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+.card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-forest);
+  box-shadow: var(--shadow-md);
+}
+
+/* Selected state for cards */
+.card-selected {
+  border-color: var(--brand-forest) !important;
+  border-width: 2px !important;
+  background-color: var(--bg-surface-tint) !important;
+}
+
+/* Active navigation item styling */
+.nav-link.active {
+  background-color: var(--brand-forest);
+  color: #FFFFFF !important;
+}
+
+/* Tab content visibility */
+.tab-pane {
+  display: none;
+  animation: fadeInTab 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Circular Cascade Stepper */
+.journey-node {
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.journey-node.active-stage {
+  border-color: var(--brand-forest);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 2px var(--brand-forest);
+}
+
+.journey-node.active-stage .stage-num {
+  background-color: var(--brand-lime);
+  color: var(--brand-forest);
+  font-weight: 700;
+}
+
+/* Schematics & Diagrams */
+.schematic-box {
+  background: #0E1A14;
+  color: #E2ECE5;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.schematic-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 243, 73, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Score Dial & Radial Gauges */
+.gauge-meter circle {
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+/* Custom Interactive Sliders */
+input[type="range"].custom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #D8D3C6;
+  outline: none;
+}
+
+input[type="range"].custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--brand-forest);
+  border: 2px solid var(--brand-lime);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"].custom-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+.live-pulse {
+  animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 300px;
+  max-width: 420px;
+  padding: 12px 16px;
+  background-color: var(--brand-forest);
+  color: #FFFFFF;
+  border-radius: 8px;
+  border-left: 4px solid var(--brand-lime);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: slideInToast 0.3s ease-out forwards;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Print Friendly Diagnosis Report */
+@media print {
+  header, footer, #judge-bar, .no-print, button, #toast-container {
+    display: none !important;
+  }
+  body, main {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    padding: 0 !important;
+  }
+  .card-clean {
+    border: 1px solid #999 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+}
