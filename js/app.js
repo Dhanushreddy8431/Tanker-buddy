@@ -11,15 +11,15 @@ document.addEventListener("DOMContentLoaded", async function() {
   const state = {
     currentSegment: "household", // "household" or "rwa"
     calculator: {
-      volume: 6000,
+      volume: 4000,
       source: "borewell",
-      treatment: "softened",
+      treatment: "raw", // Default unsoftened baseline so 4,000L starts at ₹550
       isBulk: false
     },
     householdForm: {
-      volume: 6000,
+      volume: 4000,
       source: "borewell",
-      treatment: "softened",
+      treatment: "raw", // Default unsoftened baseline
       hoseLength: "<30 ft",
       frequency: "Immediate One-Time",
       sensorRequested: false
@@ -90,7 +90,17 @@ document.addEventListener("DOMContentLoaded", async function() {
       basePrice = (volumeLiters / 1000) * p.bulkRatePer1000L;
     } else {
       const volObj = p.volumes.find(v => parseInt(v.id) === volumeLiters);
-      basePrice = volObj ? volObj.basePrice : 1400;
+      if (volObj) {
+        basePrice = volObj.basePrice;
+      } else {
+        // Fallback interpolation for unsoftened baseline
+        if (volumeLiters <= 4000) basePrice = 550;
+        else if (volumeLiters <= 6000) basePrice = 650;
+        else if (volumeLiters <= 8000) basePrice = 850;
+        else if (volumeLiters <= 10000) basePrice = 1050;
+        else if (volumeLiters <= 12000) basePrice = 1250;
+        else basePrice = (volumeLiters / 1000) * p.bulkRatePer1000L;
+      }
     }
 
     const sourceObj = p.sources.find(s => s.id === sourceId) || p.sources[0];
@@ -99,14 +109,14 @@ document.addEventListener("DOMContentLoaded", async function() {
     const treatmentObj = p.treatments.find(t => t.id === treatmentId) || p.treatments[0];
     const treatmentSurcharge = treatmentObj.surcharge;
 
-    const transitFee = p.logisticsFee; // 100
+    const transitFee = p.logisticsFee; // Fixed ₹50
     const subtotal = basePrice + sourceSurcharge + treatmentSurcharge + transitFee;
     const gst = Math.round(subtotal * p.gstRate);
     const total = subtotal + gst;
 
     // Cartel comparison calculation
     let cartelEstimate = (volumeLiters / 6000) * p.summerSurgeCartelAverage;
-    if (cartelEstimate < 1800) cartelEstimate = 1800;
+    if (cartelEstimate < 1200) cartelEstimate = 1200;
     const estimatedSavings = Math.max(0, Math.round(cartelEstimate - total));
 
     return {
@@ -358,7 +368,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     if (transitFeeEl) transitFeeEl.textContent = `₹${bill.transitFee.toLocaleString("en-IN")}`;
     if (savingsEl) savingsEl.textContent = `₹${bill.estimatedSavings.toLocaleString("en-IN")}`;
     
-    if (baseVolLabelEl) baseVolLabelEl.textContent = `${bill.volumeLiters.toLocaleString("en-IN")}L Base Delivery`;
+    if (baseVolLabelEl) baseVolLabelEl.textContent = `${bill.volumeLiters.toLocaleString("en-IN")}L Base Delivery (Without Soften)`;
     if (sourceLabelEl) sourceLabelEl.textContent = bill.sourceObj.name;
     if (treatmentLabelEl) treatmentLabelEl.textContent = bill.treatmentObj.name;
   }

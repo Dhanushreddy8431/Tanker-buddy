@@ -21,26 +21,28 @@ The platform directly serves two key customer segments:
 ### 1. Bengaluru Realistic Pricing & Logistics Model (INR ₹)
 A dynamic, real-time pricing engine calculating transparent municipal tariffs without arbitrary cartel markups:
 
-- **A. Base Volume Capacity:**
-  - `4,000 Liters` (Mini Tanker / Independent House Sump): **₹1,000**
-  - `6,000 Liters` (Standard Tanker): **₹1,400**
-  - `10,000 Liters` (Shared Apartment Sump): **₹2,200**
-  - `12,000 Liters` (Commercial / Society Heavy Capacity): **₹2,600**
-  - `Custom Bulk Option for RWAs` (&gt;20,000L to 100,000L): **₹180 per 1,000L** bulk contract rate.
+- **A. Base Volume Capacity (Without Softening Baseline):**
+  - `4,000 Liters` (Mini Tanker / Independent House Sump): **₹550** *(Without Soften)*
+  - `6,000 Liters` (Standard Tanker): **₹650** *(Without Soften)*
+  - `8,000 Liters` (Medium Tanker / Multi-Family Sump): **₹850** *(Without Soften)*
+  - `10,000 Liters` (Shared Apartment Sump): **₹1,050** *(Without Soften)*
+  - `12,000 Liters` (Commercial / Society Heavy Capacity): **₹1,250** *(Without Soften)*
+  - `Custom Bulk Option for RWAs` (&gt;12,000L to 100,000L): **₹100 per 1,000L** bulk contract rate.
 - **B. Certified Source Origin Surcharge:**
   - Deep Aquifer Borewell (Standard subterranean groundwater): **+₹0**
-  - Ponto / Lake Basin Treated Reservoir: **+₹250**
-  - Authentic BWSSB Bulk Cauvery Tap (Low initial mineral load): **+₹500**
-- **C. Treatment & Water Grade:**
-  - Raw Hard Water (Construction, gardening, basic flushing): **+₹0**
-  - Sediment Filtered Utility (Suspended solids & turbidity removed): **+₹250**
-  - Centralized Ion-Exchange Softened Water (&lt;100 ppm Hardness, hair/skin & pipe scale safe): **+₹450**
-  - BIS 10500 Potable Grade (Multi-stage RO + UV purified): **+₹750**
+  - Ponto / Lake Basin Treated Reservoir: **+₹150**
+  - Authentic BWSSB Bulk Cauvery Tap (Low initial mineral load): **+₹250**
+- **C. Treatment & Softening Customization Grade:**
+  - Raw Hard Water (Without Soften Baseline): **+₹0** (Base price applies without softening markup)
+  - Sediment Filtered Utility (Suspended solids & turbidity removed): **+₹100**
+  - Centralized Ion-Exchange Softened Water (&lt;100 ppm Hardness, hair/skin & pipe scale safe): **+₹250**
+  - Custom Ultra-Soft Zero-Scale Grade (&lt;50 ppm Premium Cation Polish): **+₹380**
+  - BIS 10500 Potable Grade (Multi-stage RO + UV purified): **+₹500**
 - **D. Logistics & Statutory Fees:**
-  - Transit & Toll Logistics: **Fixed ₹100**
+  - Transit & Toll Logistics: **Fixed ₹50**
   - Statutory Tax: **5% GST** calculated on total subtotal.
   - **Peak Summer Surge Protection Guarantee:** Subscribed members and contract holders are exempt from seasonal price gouging (e.g., March–June Bangalore water crises when unorganized tanker syndicates charge ₹2,500 - ₹3,500).
-- **Real-Time Collapsible Bill Summary:** Itemized breakdown updates instantaneously as users modify volume, source origin, or treatment grade.
+- **Real-Time Collapsible Bill Summary:** Itemized breakdown updates instantaneously as users modify volume, source origin, or treatment customization.
 
 ---
 

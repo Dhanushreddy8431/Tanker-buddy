@@ -29,16 +29,17 @@ const TANKER_BUDDY_DATA = {
 
   // 1. BANGALORE REALISTIC PRICING ENGINE BENCHMARKS (INR ₹)
   pricingEngine: {
-    // A. Base Volume Capacity
+    // A. Base Volume Capacity (Without Softening Baseline)
     volumes: [
-      { id: "4000", label: "4,000 Liters", desc: "Mini Tanker / Independent House Sump", basePrice: 1000, recommendedFor: "Villas & 2-3 BHK Individual Homes" },
-      { id: "6000", label: "6,000 Liters", desc: "Standard Tanker", basePrice: 1400, recommendedFor: "Large Independent Homes & Multi-floor Dwellings" },
-      { id: "10000", label: "10,000 Liters", desc: "Shared Apartment Sump", basePrice: 2200, recommendedFor: "Small Society Sumps (10-25 flats)" },
-      { id: "12000", label: "12,000 Liters", desc: "Commercial / Society Heavy Capacity", basePrice: 2600, recommendedFor: "Medium RWAs & High-capacity Sumps" }
+      { id: "4000", label: "4,000 Liters", desc: "Mini Tanker / Independent House Sump (Unsoftened: ₹550)", basePrice: 550, recommendedFor: "Villas & 2-3 BHK Individual Homes" },
+      { id: "6000", label: "6,000 Liters", desc: "Standard Tanker (Unsoftened: ₹650)", basePrice: 650, recommendedFor: "Large Independent Homes & Multi-floor Dwellings" },
+      { id: "8000", label: "8,000 Liters", desc: "Medium Tanker (Unsoftened: ₹850)", basePrice: 850, recommendedFor: "Independent Villas & Multi-Family Homes" },
+      { id: "10000", label: "10,000 Liters", desc: "Shared Apartment Sump (Unsoftened: ₹1,050)", basePrice: 1050, recommendedFor: "Small Society Sumps (10-25 flats)" },
+      { id: "12000", label: "12,000 Liters", desc: "Commercial / Society Heavy Capacity (Unsoftened: ₹1,250)", basePrice: 1250, recommendedFor: "Medium RWAs & High-capacity Sumps" }
     ],
-    // Custom Bulk Option for RWAs (>20,000L to 100,000L)
-    bulkRatePer1000L: 180, // ₹180 per 1,000L bulk contract rate
-    bulkMinLiters: 20000,
+    // Custom Bulk Option for RWAs (>12,000L to 100,000L)
+    bulkRatePer1000L: 100, // ₹100 per 1,000L bulk contract rate
+    bulkMinLiters: 12000,
     bulkMaxLiters: 100000,
 
     // B. Certified Source Origin Surcharge
@@ -53,26 +54,26 @@ const TANKER_BUDDY_DATA = {
       {
         id: "ponto",
         name: "Ponto / Lake Basin Treated Reservoir",
-        surcharge: 250,
+        surcharge: 150,
         desc: "Ecologically harvested & pre-settled lake aquifer reservoir water with multi-stage aeration.",
         mineralProfile: "Medium Mineral / Organic Turbidity Screened"
       },
       {
         id: "cauvery",
         name: "Authentic BWSSB Bulk Cauvery Tap",
-        surcharge: 500,
+        surcharge: 250,
         desc: "Direct bulk metered tap from BWSSB Stage IV pipeline terminal. Low initial mineral load.",
         mineralProfile: "Low Initial Mineral Load / Pristine Surface Water"
       }
     ],
 
-    // C. Treatment & Water Grade
+    // C. Treatment & Water Grade (Customizable Softening Levels)
     treatments: [
       {
         id: "raw",
-        name: "Raw Hard Water",
+        name: "Raw Hard Water (Without Soften Baseline)",
         surcharge: 0,
-        desc: "Basic screened utility water for civil construction, garden irrigation, and heavy flushing.",
+        desc: "Basic unsoftened groundwater utility. Zero softening treatment applied. For gardening, construction, and flushing.",
         tdsRange: "850 - 1300 ppm",
         hardnessRange: "550 - 850 ppm CaCO3",
         bestUse: "Construction, Landscaping, Basements"
@@ -80,36 +81,45 @@ const TANKER_BUDDY_DATA = {
       {
         id: "filtered",
         name: "Sediment Filtered Utility",
-        surcharge: 250,
-        desc: "Multi-grade sand & 5-micron dual sediment filtration. Suspended solids and silt turbidity removed.",
+        surcharge: 100,
+        desc: "Multi-grade sand & 5-micron dual sediment filtration. Suspended solids and silt turbidity removed, unsoftened.",
         tdsRange: "700 - 950 ppm",
         hardnessRange: "450 - 700 ppm CaCO3",
         bestUse: "General domestic cleaning & washing"
       },
       {
         id: "softened",
-        name: "Centralized Ion-Exchange Softened Water",
-        surcharge: 450,
-        desc: "Food-grade cation resin softened water. Hardness <100 ppm. Zero limescale on bathroom fittings, soft on hair/skin, protects solar geysers.",
+        name: "Centralized Ion-Exchange Softened Water (<100 ppm)",
+        surcharge: 250,
+        desc: "Standard cation resin soft water. Hardness <100 ppm. Zero limescale on bathroom fittings, soft on hair/skin, protects solar geysers.",
         tdsRange: "250 - 380 ppm",
         hardnessRange: "< 80 ppm CaCO3 (Soft)",
         bestUse: "Bathing, Hair Washing, Appliances, Clothes Washing"
       },
       {
+        id: "softened_ultra",
+        name: "Custom Ultra-Soft Zero-Scale Grade (<50 ppm)",
+        surcharge: 380,
+        desc: "High-regeneration dual-column ion-exchange soft water (<50 ppm). Silky lather, zero scaling on chrome fittings & expensive fixtures.",
+        tdsRange: "180 - 280 ppm",
+        hardnessRange: "< 50 ppm CaCO3 (Ultra Soft)",
+        bestUse: "Luxury Bathing, Sensitive Skin, Premium Fixtures"
+      },
+      {
         id: "potable",
         name: "BIS 10500 Potable Grade",
-        surcharge: 750,
+        surcharge: 500,
         desc: "High-volume RO desalination + UV sterilization + remineralization meeting Indian Standard BIS 10500:2012 specification for drinking.",
         tdsRange: "80 - 150 ppm",
-        hardnessRange: "< 50 ppm CaCO3",
+        hardnessRange: "< 35 ppm CaCO3",
         bestUse: "Complete Residential Drinking & Cooking Utility"
       }
     ],
 
     // D. Logistics & Statutory Fees
-    logisticsFee: 100, // Fixed ₹100 transit & toll logistics
+    logisticsFee: 50, // Fixed ₹50 transit & toll logistics
     gstRate: 0.05,     // 5% GST on subtotal
-    summerSurgeCartelAverage: 2400 // Typical unregulated cartel 6,000L surge price in Bengaluru summer
+    summerSurgeCartelAverage: 1500 // Typical unregulated cartel 6,000L surge price in Bengaluru summer
   },
 
   // Trust & Water Telemetry Transparency: Unregulated Tankers vs Tanker Buddy
@@ -356,7 +366,7 @@ const TANKER_BUDDY_DATA = {
       inletDetails: "Dual 3-inch camlock manifold into 400kL underground sump",
       hoseLength: "30-60 ft",
       sensorRequested: true,
-      estimatedPrice: 9000, // per day bulk calculation
+      estimatedPrice: 5828, // 50 * 100 + 250 + 250 + 50 = 5550 + 5% = 5827.5
       status: "Delivery Active",
       timestamp: "2026-10-30T06:15:00.000Z",
       notes: "Dedicated morning supply corridor. Sump sensor telemetry integrated into society dashboard."
@@ -375,13 +385,13 @@ const TANKER_BUDDY_DATA = {
       source: "cauvery",
       sourceLabel: "Authentic BWSSB Bulk Cauvery Tap",
       treatment: "softened",
-      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water (<100 ppm)",
       deliveryWindow: "05:00 AM - 08:00 AM",
       frequency: "Daily Contract",
       inletDetails: "Basement height clearance 3.6m. Dual 6-inch underground inlet.",
       hoseLength: "<30 ft",
       sensorRequested: true,
-      estimatedPrice: 14400,
+      estimatedPrice: 8978, // 80 * 100 + 250 + 250 + 50 = 8550 + 5% = 8977.5
       status: "Inlet Verified",
       timestamp: "2026-10-29T14:30:00.000Z",
       notes: "Inlet pressure test passed. Ultrasonic sump sensor installation scheduled for Friday."
@@ -400,13 +410,13 @@ const TANKER_BUDDY_DATA = {
       source: "borewell",
       sourceLabel: "Deep Aquifer Borewell",
       treatment: "softened",
-      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water (<100 ppm)",
       deliveryWindow: "09:00 AM - 12:00 PM",
       frequency: "Weekly",
       inletDetails: "Rear garden sump; requires extended hose",
       hoseLength: ">60 ft with booster pump",
       sensorRequested: true,
-      estimatedPrice: 2048, // 1400 + 0 + 450 + 100 = 1950 + 5% = 2047.5
+      estimatedPrice: 998, // 650 + 0 + 250 + 50 = 950 + 5% = 997.5
       status: "Contacted",
       timestamp: "2026-10-30T18:40:00.000Z",
       notes: "Customer requested ion-exchange softening specifically for hair fall prevention and geyser life."
@@ -431,7 +441,7 @@ const TANKER_BUDDY_DATA = {
       inletDetails: "Ground floor external sump inlet",
       hoseLength: "30-60 ft",
       sensorRequested: false,
-      estimatedPrice: 3728, // 2200 + 500 + 750 + 100 = 3550 + 5% = 3727.5
+      estimatedPrice: 1943, // 1050 + 250 + 500 + 50 = 1850 + 5% = 1942.5
       status: "New Lead",
       timestamp: "2026-10-31T08:15:00.000Z",
       notes: "Potable BIS grade required for family cooking & domestic drinking tank."
@@ -449,17 +459,17 @@ const TANKER_BUDDY_DATA = {
       volumeLabel: "4,000 Liters (Mini Tanker)",
       source: "borewell",
       sourceLabel: "Deep Aquifer Borewell",
-      treatment: "softened",
-      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      treatment: "raw",
+      treatmentLabel: "Raw Hard Water (Without Soften Baseline)",
       deliveryWindow: "06:00 AM - 09:00 AM",
       frequency: "Alternate Days",
       inletDetails: "Standard front porch sump cover",
       hoseLength: "<30 ft",
       sensorRequested: true,
-      estimatedPrice: 1628, // 1000 + 0 + 450 + 100 = 1550 + 5% = 1627.5
+      estimatedPrice: 630, // 550 + 0 + 0 + 50 = 600 + 5% = 630
       status: "Delivery Active",
       timestamp: "2026-10-28T11:20:00.000Z",
-      notes: "Subscribed member. Surge protected. Free ultrasonic sensor installed."
+      notes: "Subscribed member. Unsoftened baseline rate applied. Free ultrasonic sensor installed."
     },
     {
       id: "TB-BLR-2026-1006",
@@ -481,10 +491,35 @@ const TANKER_BUDDY_DATA = {
       inletDetails: "300kL underground storage; tanker access bay at gate 2",
       hoseLength: "<30 ft",
       sensorRequested: false,
-      estimatedPrice: 6300,
+      estimatedPrice: 3990, // 35 * 100 + 150 + 100 + 50 = 3800 + 5% = 3990
       status: "Delivery Active",
       timestamp: "2026-10-27T09:00:00.000Z",
       notes: "Dual supply arrangement supplementing existing borewell yield."
+    },
+    {
+      id: "TB-BLR-2026-1007",
+      customerType: "Household",
+      customerName: "Kiran & Shalini Kumar",
+      representativeName: "Kiran Kumar",
+      phone: "9845188234",
+      email: "kiran.kumar@gmail.com",
+      cluster: "sarjapur",
+      address: "Villa #88, Rainbow Drive Layout, Sarjapur Road, Bengaluru 560035",
+      volumeLiters: 8000,
+      volumeLabel: "8,000 Liters (Medium Tanker)",
+      source: "borewell",
+      sourceLabel: "Deep Aquifer Borewell",
+      treatment: "raw",
+      treatmentLabel: "Raw Hard Water (Without Soften Baseline)",
+      deliveryWindow: "08:00 AM - 11:00 AM",
+      frequency: "Weekly",
+      inletDetails: "Driveway sump inlet, 25 ft distance",
+      hoseLength: "<30 ft",
+      sensorRequested: true,
+      estimatedPrice: 945, // 850 + 0 + 0 + 50 = 900 + 5% = 945
+      status: "New Lead",
+      timestamp: "2026-10-31T09:10:00.000Z",
+      notes: "8,000L unsoftened baseline order for home sump refilling."
     }
   ]
 };

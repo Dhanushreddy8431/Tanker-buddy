@@ -184,8 +184,8 @@
         <div id="hero-household-badge" class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <span class="text-xs text-slate-400 block">Typical Dispatch</span>
-            <strong class="text-sm sm:text-base font-bold text-white">4,000L & 6,000L</strong>
-            <p class="text-[11px] text-sky-400 mt-1">Fits independent sumps</p>
+            <strong class="text-sm sm:text-base font-bold text-white">4kL, 6kL & 8kL</strong>
+            <p class="text-[11px] text-sky-400 mt-1">Independent sumps</p>
           </div>
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <span class="text-xs text-slate-400 block">Ion-Exchange Soft</span>
@@ -194,8 +194,8 @@
           </div>
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <span class="text-xs text-slate-400 block">Fixed Base Price</span>
-            <strong class="text-sm sm:text-base font-bold text-white">₹1,000 / 4,000L</strong>
-            <p class="text-[11px] text-emerald-400 mt-1">₹0 surge even in May</p>
+            <strong class="text-sm sm:text-base font-bold text-white">₹550 / 4,000L</strong>
+            <p class="text-[11px] text-emerald-400 mt-1">Without soften baseline</p>
           </div>
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <span class="text-xs text-slate-400 block">Delivery SLA</span>
@@ -212,7 +212,7 @@
           </div>
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <span class="text-xs text-slate-400 block">Bulk Contract Rate</span>
-            <strong class="text-sm sm:text-base font-bold text-emerald-400">₹180 / 1,000L</strong>
+            <strong class="text-sm sm:text-base font-bold text-emerald-400">₹100 / 1,000L</strong>
             <p class="text-[11px] text-emerald-400 mt-1">Up to 40% vs spot cartel</p>
           </div>
           <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
@@ -678,20 +678,21 @@
             <div>
               <div class="flex justify-between items-center mb-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-300">A. Select Water Volume Required</label>
-                <span id="calc-volume-display" class="font-mono-code text-base font-extrabold text-sky-400">6,000 Liters</span>
+                <span id="calc-volume-display" class="font-mono-code text-base font-extrabold text-sky-400">4,000 Liters</span>
               </div>
-              <input type="range" id="calc-volume-slider" class="hydro-slider" min="4000" max="60000" step="2000" value="6000">
+              <input type="range" id="calc-volume-slider" class="hydro-slider" min="4000" max="60000" step="2000" value="4000">
 
               <!-- Quick Volume Presets -->
               <div class="flex flex-wrap gap-2 mt-3">
-                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="4000">4,000L</button>
-                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="6000">6,000L</button>
-                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="10000">10,000L</button>
-                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="12000">12,000L</button>
+                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="4000">4,000L (₹550)</button>
+                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="6000">6,000L (₹650)</button>
+                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="8000">8,000L (₹850)</button>
+                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="10000">10,000L (₹1,050)</button>
+                <button class="calc-preset-chip px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-sky-500 text-xs font-mono-code text-slate-300 transition" data-volume="12000">12,000L (₹1,250)</button>
                 <button class="calc-preset-chip px-2.5 py-1 rounded bg-indigo-950 border border-indigo-700 hover:border-indigo-500 text-xs font-mono-code text-indigo-300 transition" data-volume="25000">25,000L (RWA)</button>
                 <button class="calc-preset-chip px-2.5 py-1 rounded bg-indigo-950 border border-indigo-700 hover:border-indigo-500 text-xs font-mono-code text-indigo-300 transition" data-volume="50000">50,000L (RWA)</button>
               </div>
-              <p class="text-[11px] text-slate-500 mt-2">Volumes &gt;12,000L automatically unlock RWA bulk contract rate: <strong>₹180 per 1,000L</strong>.</p>
+              <p class="text-[11px] text-slate-500 mt-2">Volumes &gt;12,000L automatically unlock RWA bulk contract rate: <strong>₹100 per 1,000L</strong>.</p>
             </div>
 
             <!-- 2. Source Origin -->
@@ -699,27 +700,29 @@
               <label for="calc-source-select" class="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2">B. Certified Source Origin</label>
               <select id="calc-source-select" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-sky-500 outline-none">
                 <option value="borewell">Deep Aquifer Borewell (Standard Groundwater) — +₹0 Surcharge</option>
-                <option value="ponto">Ponto / Lake Basin Treated Reservoir — +₹250 Surcharge</option>
-                <option value="cauvery">Authentic BWSSB Bulk Cauvery Tap (Low Initial Mineral) — +₹500 Surcharge</option>
+                <option value="ponto">Ponto / Lake Basin Treated Reservoir — +₹150 Surcharge</option>
+                <option value="cauvery">Authentic BWSSB Bulk Cauvery Tap (Low Initial Mineral) — +₹250 Surcharge</option>
               </select>
             </div>
 
             <!-- 3. Treatment & Softening Grade -->
             <div>
-              <label for="calc-treatment-select" class="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2">C. Treatment & Softening Grade</label>
+              <label for="calc-treatment-select" class="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2">C. Treatment & Softening Grade (Customization)</label>
               <select id="calc-treatment-select" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-sky-500 outline-none">
-                <option value="raw">Raw Hard Water (Construction, gardening, flushing) — +₹0</option>
-                <option value="filtered">Sediment Filtered Utility (Suspended solids removed) — +₹250</option>
-                <option value="softened" selected>Centralized Ion-Exchange Softened (&lt;100 ppm Hardness, hair/pipe safe) — +₹450</option>
-                <option value="potable">BIS 10500 Potable Grade (Multi-stage RO + UV purified) — +₹750</option>
+                <option value="raw" selected>Raw Hard Water (Without Soften Baseline) — +₹0 (Base Price Only)</option>
+                <option value="filtered">Sediment Filtered Utility (Suspended solids removed) — +₹100 Surcharge</option>
+                <option value="softened">Centralized Ion-Exchange Softened (&lt;100 ppm Hardness, hair/pipe safe) — +₹250 Surcharge</option>
+                <option value="softened_ultra">Custom Ultra-Soft Zero-Scale Grade (&lt;50 ppm Premium Polish) — +₹380 Surcharge</option>
+                <option value="potable">BIS 10500 Potable Grade (Multi-stage RO + UV purified) — +₹500 Surcharge</option>
               </select>
+              <p class="text-[11px] text-sky-400 mt-1.5">Note: Raw water has ₹0 softening surcharge. Softened water price increases based on selected softening level.</p>
             </div>
 
             <!-- Logistics and Peak Summer Surge Notice -->
             <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
               <div class="flex justify-between items-center text-slate-300">
                 <span>Transit & Logistics Fee:</span>
-                <strong class="font-mono-code text-slate-100">Fixed ₹100</strong>
+                <strong class="font-mono-code text-slate-100">Fixed ₹50</strong>
               </div>
               <div class="flex justify-between items-center text-slate-300">
                 <span>Statutory Tax:</span>
@@ -742,24 +745,24 @@
             <!-- Receipt Line Items -->
             <div class="py-5 space-y-3 text-xs border-b border-slate-800">
               <div class="flex justify-between text-slate-300">
-                <span>Base Volume Capacity:</span>
-                <strong id="calc-out-base" class="font-mono-code text-slate-100">₹1,400</strong>
+                <span>Base Volume Capacity (Without Soften):</span>
+                <strong id="calc-out-base" class="font-mono-code text-slate-100">₹550</strong>
               </div>
               <div class="flex justify-between text-slate-300">
                 <span>Certified Origin Surcharge:</span>
                 <strong id="calc-out-source" class="font-mono-code text-slate-100">+₹0</strong>
               </div>
               <div class="flex justify-between text-slate-300">
-                <span>Treatment & Water Grade:</span>
-                <strong id="calc-out-treatment" class="font-mono-code text-slate-100">+₹450</strong>
+                <span>Softening & Customization Grade:</span>
+                <strong id="calc-out-treatment" class="font-mono-code text-slate-100">+₹0</strong>
               </div>
               <div class="flex justify-between text-slate-300">
                 <span>Transit & Toll Logistics:</span>
-                <strong id="calc-out-transit" class="font-mono-code text-slate-100">₹100</strong>
+                <strong id="calc-out-transit" class="font-mono-code text-slate-100">₹50</strong>
               </div>
               <div class="flex justify-between text-slate-400 pt-2 border-t border-slate-800/80">
                 <span>5% Statutory GST:</span>
-                <strong id="calc-out-gst" class="font-mono-code text-slate-300">₹98</strong>
+                <strong id="calc-out-gst" class="font-mono-code text-slate-300">₹30</strong>
               </div>
             </div>
 
@@ -876,27 +879,35 @@
 
             <!-- 2. Volume Selection -->
             <div>
-              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Select Tanker Capacity</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <button type="button" class="household-vol-btn p-3 rounded-xl border border-slate-700 bg-slate-950 text-left transition hover:border-sky-500" data-volume="4000">
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Select Tanker Capacity (Unsoftened Baseline Rates)</label>
+                <span class="text-[11px] text-sky-400 font-semibold">Without soften base prices</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <button type="button" class="household-vol-btn selected p-3 rounded-xl border border-sky-500 bg-sky-950/40 text-left transition" data-volume="4000">
                   <div class="text-xs text-slate-400">Mini Tanker</div>
                   <div class="font-bold font-mono-code text-white text-base mt-0.5">4,000L</div>
-                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹1,000 Base</div>
+                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹550 Base</div>
                 </button>
-                <button type="button" class="household-vol-btn selected p-3 rounded-xl border border-sky-500 bg-sky-950/40 text-left transition" data-volume="6000">
+                <button type="button" class="household-vol-btn p-3 rounded-xl border border-slate-700 bg-slate-950 text-left transition hover:border-sky-500" data-volume="6000">
                   <div class="text-xs text-slate-400">Standard Tanker</div>
                   <div class="font-bold font-mono-code text-white text-base mt-0.5">6,000L</div>
-                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹1,400 Base</div>
+                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹650 Base</div>
+                </button>
+                <button type="button" class="household-vol-btn p-3 rounded-xl border border-slate-700 bg-slate-950 text-left transition hover:border-sky-500" data-volume="8000">
+                  <div class="text-xs text-slate-400">Medium Tanker</div>
+                  <div class="font-bold font-mono-code text-white text-base mt-0.5">8,000L</div>
+                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹850 Base</div>
                 </button>
                 <button type="button" class="household-vol-btn p-3 rounded-xl border border-slate-700 bg-slate-950 text-left transition hover:border-sky-500" data-volume="10000">
                   <div class="text-xs text-slate-400">Shared Sump</div>
                   <div class="font-bold font-mono-code text-white text-base mt-0.5">10,000L</div>
-                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹2,200 Base</div>
+                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹1,050 Base</div>
                 </button>
                 <button type="button" class="household-vol-btn p-3 rounded-xl border border-slate-700 bg-slate-950 text-left transition hover:border-sky-500" data-volume="12000">
                   <div class="text-xs text-slate-400">Heavy Capacity</div>
                   <div class="font-bold font-mono-code text-white text-base mt-0.5">12,000L</div>
-                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹2,600 Base</div>
+                  <div class="text-[11px] text-sky-400 font-semibold mt-1">₹1,250 Base</div>
                 </button>
               </div>
             </div>
@@ -919,52 +930,62 @@
                       <div class="text-xs font-bold text-white">Ponto / Lake Basin Treated</div>
                       <div class="text-[11px] text-slate-400">Pre-settled & aerated reservoir</div>
                     </div>
-                    <span class="text-xs font-mono-code text-sky-300">+₹250</span>
+                    <span class="text-xs font-mono-code text-sky-300">+₹150</span>
                   </div>
                   <div class="household-source-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-source="cauvery">
                     <div>
                       <div class="text-xs font-bold text-white">Authentic BWSSB Cauvery Tap</div>
                       <div class="text-[11px] text-slate-400">Low mineral surface water</div>
                     </div>
-                    <span class="text-xs font-mono-code text-sky-300">+₹500</span>
+                    <span class="text-xs font-mono-code text-sky-300">+₹250</span>
                   </div>
                 </div>
               </div>
 
               <!-- Treatment & Water Grade -->
               <div>
-                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Treatment & Softening Grade</label>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Treatment & Softening Customization</label>
                 <div class="space-y-2">
-                  <div class="household-treatment-card selected p-3 rounded-xl border border-sky-500 bg-sky-950/40 cursor-pointer transition flex items-center justify-between" data-treatment="softened">
+                  <div class="household-treatment-card selected p-3 rounded-xl border border-sky-500 bg-sky-950/40 cursor-pointer transition flex items-center justify-between" data-treatment="raw">
                     <div>
                       <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                        Ion-Exchange Softened
+                        Raw Hard Water
+                        <span class="text-[10px] px-1.5 py-0.2 bg-slate-800 text-slate-300 rounded border border-slate-600">Without Soften</span>
+                      </div>
+                      <div class="text-[11px] text-slate-400">Direct utility water. Base price only, ₹0 softening markup.</div>
+                    </div>
+                    <span class="text-xs font-mono-code text-slate-300">+₹0</span>
+                  </div>
+                  <div class="household-treatment-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-treatment="softened">
+                    <div>
+                      <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                        Ion-Exchange Softened (&lt;100 ppm)
                         <span class="text-[10px] px-1.5 py-0.2 bg-emerald-950 text-emerald-300 rounded border border-emerald-700">Recommended</span>
                       </div>
-                      <div class="text-[11px] text-slate-400">&lt;100 ppm hardness, hair & geyser safe</div>
+                      <div class="text-[11px] text-slate-400">Protects skin, hair & solar geysers from limescale.</div>
                     </div>
-                    <span class="text-xs font-mono-code text-sky-300">+₹450</span>
+                    <span class="text-xs font-mono-code text-sky-300">+₹250</span>
+                  </div>
+                  <div class="household-treatment-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-treatment="softened_ultra">
+                    <div>
+                      <div class="text-xs font-bold text-white">Ultra-Soft Zero-Scale (&lt;50 ppm)</div>
+                      <div class="text-[11px] text-slate-400">Deep cation polish for expensive bathroom chrome.</div>
+                    </div>
+                    <span class="text-xs font-mono-code text-sky-300">+₹380</span>
                   </div>
                   <div class="household-treatment-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-treatment="filtered">
                     <div>
                       <div class="text-xs font-bold text-white">Sediment Filtered Utility</div>
-                      <div class="text-[11px] text-slate-400">Suspended solids & turbidity removed</div>
+                      <div class="text-[11px] text-slate-400">Suspended solids & turbidity removed, unsoftened.</div>
                     </div>
-                    <span class="text-xs font-mono-code text-sky-300">+₹250</span>
+                    <span class="text-xs font-mono-code text-sky-300">+₹100</span>
                   </div>
                   <div class="household-treatment-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-treatment="potable">
                     <div>
                       <div class="text-xs font-bold text-white">BIS 10500 Potable Grade</div>
-                      <div class="text-[11px] text-slate-400">RO + UV purified drinking quality</div>
+                      <div class="text-[11px] text-slate-400">RO + UV purified drinking quality.</div>
                     </div>
-                    <span class="text-xs font-mono-code text-sky-300">+₹750</span>
-                  </div>
-                  <div class="household-treatment-card p-3 rounded-xl border border-slate-700 bg-slate-950 cursor-pointer transition flex items-center justify-between" data-treatment="raw">
-                    <div>
-                      <div class="text-xs font-bold text-white">Raw Hard Water</div>
-                      <div class="text-[11px] text-slate-400">Gardening, flushing, construction</div>
-                    </div>
-                    <span class="text-xs font-mono-code text-slate-300">+₹0</span>
+                    <span class="text-xs font-mono-code text-sky-300">+₹500</span>
                   </div>
                 </div>
               </div>
@@ -1012,7 +1033,7 @@
                 <div>
                   <div class="flex items-center gap-2">
                     <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Live Order Total:</span>
-                    <span id="bill-total-price" class="text-2xl sm:text-3xl font-extrabold font-mono-code text-sky-400">₹2,048</span>
+                    <span id="bill-total-price" class="text-2xl sm:text-3xl font-extrabold font-mono-code text-sky-400">₹630</span>
                     <span class="text-[11px] text-slate-400">(Incl. 5% GST)</span>
                   </div>
                   <div class="flex items-center gap-2 mt-1">
@@ -1021,7 +1042,7 @@
                       Peak Summer Surge Protection Guarantee Active
                     </span>
                     <span class="text-slate-600">|</span>
-                    <span class="text-[11px] text-slate-400">Saves ~<strong id="bill-savings-amount" class="text-emerald-400">₹352</strong> vs cartels</span>
+                    <span class="text-[11px] text-slate-400">Saves ~<strong id="bill-savings-amount" class="text-emerald-400">₹570</strong> vs cartels</span>
                   </div>
                 </div>
 
@@ -1034,28 +1055,28 @@
               <!-- Collapsible Content -->
               <div id="bill-details-content" class="bill-details-content border-t border-slate-800/80 bg-slate-900/60 px-5 py-4 text-xs space-y-2">
                 <div class="flex justify-between text-slate-300">
-                  <span id="bill-vol-label">6,000L Base Delivery:</span>
-                  <strong id="bill-base-price" class="font-mono-code text-slate-100">₹1,400</strong>
+                  <span id="bill-vol-label">4,000L Base Delivery (Without Soften):</span>
+                  <strong id="bill-base-price" class="font-mono-code text-slate-100">₹550</strong>
                 </div>
                 <div class="flex justify-between text-slate-300">
                   <span>Certified Source (<span id="bill-source-label">Deep Aquifer Borewell</span>):</span>
                   <strong id="bill-source-price" class="font-mono-code text-slate-100">+₹0</strong>
                 </div>
                 <div class="flex justify-between text-slate-300">
-                  <span>Water Grade (<span id="bill-treatment-label">Centralized Ion-Exchange Softened</span>):</span>
-                  <strong id="bill-treatment-price" class="font-mono-code text-slate-100">+₹450</strong>
+                  <span>Treatment & Softening Customization (<span id="bill-treatment-label">Raw Hard Water (Without Soften Baseline)</span>):</span>
+                  <strong id="bill-treatment-price" class="font-mono-code text-slate-100">+₹0</strong>
                 </div>
                 <div class="flex justify-between text-slate-300">
                   <span>Transit & Toll Logistics:</span>
-                  <strong id="bill-transit-fee" class="font-mono-code text-slate-100">₹100</strong>
+                  <strong id="bill-transit-fee" class="font-mono-code text-slate-100">₹50</strong>
                 </div>
                 <div class="flex justify-between text-slate-400 pt-2 border-t border-slate-800">
                   <span>Subtotal:</span>
-                  <strong id="bill-subtotal" class="font-mono-code text-slate-200">₹1,950</strong>
+                  <strong id="bill-subtotal" class="font-mono-code text-slate-200">₹600</strong>
                 </div>
                 <div class="flex justify-between text-slate-400">
                   <span>Statutory GST (5%):</span>
-                  <strong id="bill-gst" class="font-mono-code text-slate-200">₹98</strong>
+                  <strong id="bill-gst" class="font-mono-code text-slate-200">₹30</strong>
                 </div>
               </div>
             </div>
