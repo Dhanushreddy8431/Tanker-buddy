@@ -92,6 +92,25 @@ document.addEventListener("DOMContentLoaded", async function() {
 
   window.showToast = showToast;
 
+  // Live GPS Telemetry & Google Maps Link Generators
+  function getLiveGpsCoordinates() {
+    const lat = (state.driver && state.driver.gps && state.driver.gps.lat) || "12.9716";
+    const lng = (state.driver && state.driver.gps && state.driver.gps.lng) || "77.5946";
+    const accuracy = (state.driver && state.driver.gps && state.driver.gps.accuracy) || 12;
+    return {
+      lat,
+      lng,
+      accuracy,
+      mapUrl: `https://www.google.com/maps?q=${lat},${lng}`
+    };
+  }
+
+  function getGpsRouteUrl(destAddress) {
+    const { lat, lng } = getLiveGpsCoordinates();
+    const cleanDest = (destAddress || "").trim() ? destAddress + ", Bengaluru" : "Bengaluru";
+    return `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${encodeURIComponent(cleanDest)}`;
+  }
+
   // Pricing Calculation Function
   function calculateBill(volumeLiters, sourceId, treatmentId, isBulk = false) {
     const p = TANKER_BUDDY_DATA.pricingEngine;
@@ -865,14 +884,18 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
     const businessWhatsApp = localStorage.getItem("tanker_buddy_business_whatsapp") || customerPhone;
 
-    // Message for Customer's Personal WhatsApp
+    const { lat, lng } = getLiveGpsCoordinates();
+    const gpsMapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+    const gpsRouteUrl = getGpsRouteUrl(lead.address);
+
+    // Message for Customer's Personal WhatsApp (Includes Clickable Live GPS Google Maps Link)
     const waTextCustomer = encodeURIComponent(
-      `Hello ${lead.customerName}! Here is your confirmed Tanker Buddy Bengaluru water booking receipt:\n\n*Reference ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Phone:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Treatment:* ${lead.treatmentLabel}\n*Source:* ${lead.sourceLabel}\n*Delivery Window:* ${lead.deliveryWindow}\n*Address:* ${lead.address}\n*Total Payable:* ₹${bill.total.toLocaleString("en-IN")}\n\nOur municipal tanker driver will coordinate with you upon arrival.`
+      `Hello ${lead.customerName}! Here is your confirmed Tanker Buddy Bengaluru water booking receipt:\n\n*Reference ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Phone:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Treatment:* ${lead.treatmentLabel}\n*Source:* ${lead.sourceLabel}\n*Delivery Window:* ${lead.deliveryWindow}\n*Address:* ${lead.address}\n*Total Payable:* ₹${bill.total.toLocaleString("en-IN")}\n\n📍 *Live GPS Delivery Tracking Link:*\n${gpsRouteUrl}\n\n🛰️ *Corridor Live GPS Pin:*\n${gpsMapUrl}\n\n👉 *Click the link above to track your water tanker live on Google Maps!*`
     );
 
     // Message for Tanker Buddy Dispatch / Business WhatsApp
     const waTextDispatch = encodeURIComponent(
-      `Hello Tanker Buddy Bengaluru Dispatch!\n\nI have just submitted a water booking request.\n*Ref ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Customer WhatsApp:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Grade:* ${lead.treatmentLabel}\n*Cluster:* ${lead.cluster}\n*Delivery Address:* ${lead.address}\n*Total INR:* ₹${bill.total.toLocaleString("en-IN")}\n\nPlease confirm corridor dispatch slot.`
+      `Hello Tanker Buddy Bengaluru Dispatch!\n\nI have just submitted a water booking request.\n*Ref ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Customer WhatsApp:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Grade:* ${lead.treatmentLabel}\n*Cluster:* ${lead.cluster}\n*Delivery Address:* ${lead.address}\n*Total INR:* ₹${bill.total.toLocaleString("en-IN")}\n\n📍 *Live Delivery Route (Google Maps):*\n${gpsRouteUrl}\n\n🛰️ *Corridor Tanker GPS:*\n${gpsMapUrl}\n\nPlease confirm corridor dispatch slot.`
     );
 
     container.innerHTML = `
@@ -974,6 +997,11 @@ document.addEventListener("DOMContentLoaded", async function() {
               <span>💼 Notify Official Dispatch (+91 ${businessWhatsApp})</span>
             </a>
           ` : ''}
+
+          <a href="${gpsRouteUrl}" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold text-xs flex items-center justify-center gap-2 border border-sky-800/60 transition">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>📍 Open Live GPS Delivery Route (Google Maps)</span>
+          </a>
 
           <button onclick="document.getElementById('receipt-modal').classList.add('hidden')" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">
             Close Receipt
@@ -1131,7 +1159,9 @@ document.addEventListener("DOMContentLoaded", async function() {
           hour12: true
         });
         const dateStr = `${dateFormatted}, ${timeFormatted}`;
-        const waUrl = `https://wa.me/91${lead.phone}?text=${encodeURIComponent(`Hello ${lead.customerName}, this is Tanker Buddy Dispatch regarding your water order ${lead.id}. We are coordinating your scheduled tanker delivery.`)}`;
+        const leadGpsRoute = getGpsRouteUrl(lead.address);
+        const cleanPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+        const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.customerName}! This is Tanker Buddy Bengaluru Dispatch regarding water order *${lead.id}*.\n\n📍 *Live Delivery Route & GPS Tracking Link:*\n${leadGpsRoute}\n\n👉 *Click the link above to view your scheduled delivery corridor on Google Maps!*`)}`;
 
         const isRwa = lead.customerType === "RWA";
 
@@ -1210,6 +1240,10 @@ document.addEventListener("DOMContentLoaded", async function() {
       const content = document.getElementById("lead-detail-modal-content");
       if (!modal || !content) return;
 
+      const leadGpsRoute = getGpsRouteUrl(lead.address);
+      const cleanLeadPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+      const waModalText = encodeURIComponent(`Hello ${lead.customerName}! Tanker Buddy Bengaluru Dispatch regarding water order *${lead.id}*.\n\n📍 *Live GPS Delivery Tracking Link:*\n${leadGpsRoute}\n\n👉 *Click the link above to view your delivery corridor on Google Maps!*`);
+
       content.innerHTML = `
         <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 text-slate-100 max-w-xl w-full shadow-2xl">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
@@ -1259,10 +1293,15 @@ document.addEventListener("DOMContentLoaded", async function() {
             <p class="text-slate-300 italic">${lead.notes || 'No special instructions provided.'}</p>
           </div>
 
-          <div class="flex justify-between items-center pt-2">
-            <a href="https://wa.me/91${lead.phone}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-2">
-              Chat on WhatsApp
-            </a>
+          <div class="flex flex-wrap gap-2 justify-between items-center pt-2">
+            <div class="flex flex-wrap gap-2">
+              <a href="https://wa.me/91${cleanLeadPhone}?text=${waModalText}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-2 shadow transition">
+                <span>💬 Chat on WhatsApp (with GPS)</span>
+              </a>
+              <a href="${leadGpsRoute}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold text-xs flex items-center gap-1.5 border border-slate-700 transition">
+                <span>📍 GPS Route</span>
+              </a>
+            </div>
             <button onclick="document.getElementById('lead-detail-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
               Close
             </button>
@@ -1761,8 +1800,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         } else {
           availGrid.innerHTML = availableOrders.map(lead => {
             const dateStr = lead.timestamp ? new Date(lead.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "N/A";
-            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lead.address + ", Bengaluru")}`;
+            const gmapsUrl = getGpsRouteUrl(lead.address);
             const isRwa = lead.customerType === "RWA";
+            const cleanLeadPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+            const driverWaMsg = encodeURIComponent(`Hello ${lead.customerName}! Tanker Buddy Fleet Driver is assigned for your water delivery (*${lead.id}*).\n\n📍 *Live GPS Delivery Tracking Link:*\n${gmapsUrl}\n\n👉 *Click the link above to track tanker live on Google Maps!*`);
 
             return `
               <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-2xl p-5 shadow-lg transition flex flex-col justify-between space-y-4">
@@ -1818,7 +1859,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                       <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                       <span>GPS Route</span>
                     </a>
-                    <a href="https://wa.me/91${lead.phone}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                    <a href="https://wa.me/91${cleanLeadPhone}?text=${driverWaMsg}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                       <span>💬 WhatsApp</span>
                     </a>
                   </div>
@@ -1845,7 +1886,11 @@ document.addEventListener("DOMContentLoaded", async function() {
           `;
         } else {
           activeGrid.innerHTML = activeOrders.map(lead => {
-            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lead.address + ", Bengaluru")}`;
+            const gmapsUrl = getGpsRouteUrl(lead.address);
+            const { lat, lng } = getLiveGpsCoordinates();
+            const liveTankerPin = `https://www.google.com/maps?q=${lat},${lng}`;
+            const cleanLeadPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+            const activeWaMsg = encodeURIComponent(`Hello ${lead.customerName}! Tanker Buddy driver ${currentDriver.name} is on the way with your water order *${lead.id}* in vehicle ${currentDriver.vehicleNo}.\n\n📍 *Live GPS Turn-by-Turn Delivery Route:*\n${gmapsUrl}\n\n🛰️ *Current Tanker GPS Pin:*\n${liveTankerPin}\n\n👉 *Click the Google Maps link above to track live location and arrival!*`);
             const driverStatus = lead.driverStatus || "Claimed / En Route";
             const isPumping = driverStatus.toLowerCase().includes("pumping");
 
@@ -1897,10 +1942,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                   <a href="${gmapsUrl}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                     <span>🗺️ GPS Route</span>
                   </a>
-                  <a href="tel:+91${lead.phone}" class="py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                  <a href="tel:+91${cleanLeadPhone}" class="py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                     <span>📞 Call</span>
                   </a>
-                  <a href="https://wa.me/91${lead.phone}?text=${encodeURIComponent(`Hello ${lead.customerName}, Tanker Buddy driver ${currentDriver.name} is on the way with your water order ${lead.id} in vehicle ${currentDriver.vehicleNo}.`)}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                  <a href="https://wa.me/91${cleanLeadPhone}?text=${activeWaMsg}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                     <span>💬 WhatsApp</span>
                   </a>
                 </div>
@@ -2105,7 +2150,19 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (modalInput && !modalInput.value) modalInput.value = num;
         if (dashInputPhone && !dashInputPhone.value) dashInputPhone.value = num;
         
-        const testUrl = `https://wa.me/91${num}?text=${encodeURIComponent("Hello Tanker Buddy Bengaluru Dispatch! Testing verified Business WhatsApp link.")}`;
+        const { lat, lng, accuracy } = getLiveGpsCoordinates();
+        const liveGpsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+
+        let orderCorridorInfo = "";
+        if (allLeads && allLeads.length > 0) {
+          const latest = allLeads[0];
+          const routeLink = getGpsRouteUrl(latest.address);
+          orderCorridorInfo = `\n\n📦 *Active Delivery Corridor:* ${latest.id} (${latest.customerName} - ${latest.volumeLabel})\n📍 *Live Delivery Route (Google Maps):*\n${routeLink}`;
+        }
+
+        const waTestMsg = `Hello Tanker Buddy Bengaluru Dispatch!\n\nVerified Business WhatsApp Connected.\n\n📍 *Live Tanker GPS Tracking Link:*\n${liveGpsLink}${orderCorridorInfo}\n\n🛰️ *Corridor Telemetry:* ${lat}° N, ${lng}° E (±${accuracy}m)\n\n👉 *Click the Google Maps link above to open and track live GPS coordinates!*`;
+
+        const testUrl = `https://wa.me/91${num}?text=${encodeURIComponent(waTestMsg)}`;
         if (modalTestLink) {
           modalTestLink.href = testUrl;
           modalTestLink.classList.remove("pointer-events-none", "opacity-50");
@@ -2113,6 +2170,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (dashTestBtn) {
           dashTestBtn.href = testUrl;
           dashTestBtn.classList.remove("pointer-events-none", "opacity-50");
+        }
+        const dashGpsBtn = document.getElementById("wa-dash-gps-direct-btn");
+        if (dashGpsBtn) {
+          dashGpsBtn.href = liveGpsLink;
         }
         if (navStatus) {
           navStatus.className = "w-2 h-2 rounded-full bg-emerald-400";
@@ -2154,8 +2215,18 @@ document.addEventListener("DOMContentLoaded", async function() {
             const dateStr = lead.timestamp ? new Date(lead.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Today";
             const cleanPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
             
-            const waReceiptUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.customerName}! Tanker Buddy Dispatch confirming your water order *${lead.id}*. Volume: ${lead.volumeLabel}, Grade: ${lead.treatmentLabel}, Delivery Address: ${lead.address}, Total Payable: ₹${lead.estimatedPrice}.`)}`;
-            const waDriverUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.customerName}! Your Tanker Buddy driver has been assigned and is heading towards your location for delivery of ${lead.volumeLabel}.`)}`;
+            const orderGpsRoute = getGpsRouteUrl(lead.address);
+            const { lat, lng } = getLiveGpsCoordinates();
+            const orderGpsPin = `https://www.google.com/maps?q=${lat},${lng}`;
+
+            const waReceiptMsg = `Hello ${lead.customerName}! Tanker Buddy Dispatch confirming your water order *${lead.id}*.\n\n*Volume:* ${lead.volumeLabel}\n*Treatment:* ${lead.treatmentLabel}\n*Delivery Address:* ${lead.address}\n*Total Payable:* ₹${lead.estimatedPrice}\n\n📍 *Live GPS Delivery Tracking Link:*\n${orderGpsRoute}\n\n👉 *Click the link above to track your tanker live on Google Maps!*`;
+            const waReceiptUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waReceiptMsg)}`;
+
+            const waDriverMsg = `Hello ${lead.customerName}! Your Tanker Buddy driver has been assigned and is heading towards your location for delivery of ${lead.volumeLabel} (*${lead.id}*).\n\n📍 *Live Tanker GPS Tracking Link:*\n${orderGpsRoute}\n\n👉 *Click the link above to track live tanker arrival on Google Maps!*`;
+            const waDriverUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waDriverMsg)}`;
+
+            const waGpsShareMsg = `📍 *Tanker Buddy Live GPS Tracking for Order ${lead.id}*\n\n*Customer:* ${lead.customerName}\n*Delivery Address:* ${lead.address}\n\n🗺️ *Open Live GPS Delivery Route:*\n${orderGpsRoute}\n\n🛰️ *Current Tanker GPS Pin:*\n${orderGpsPin}\n\n👉 *Click either link above to open directly in Google Maps!*`;
+            const waGpsShareUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waGpsShareMsg)}`;
 
             return `
               <tr class="border-b border-slate-800 hover:bg-slate-800/40 transition">
@@ -2178,6 +2249,9 @@ document.addEventListener("DOMContentLoaded", async function() {
                   ₹${(lead.estimatedPrice || 0).toLocaleString("en-IN")}
                 </td>
                 <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+                  <a href="${waGpsShareUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-950 hover:bg-amber-900 border border-amber-700 text-amber-300 font-semibold text-[11px] transition" title="Open GPS Tracking Link in WhatsApp">
+                    <span>📍 GPS Track Link</span>
+                  </a>
                   <a href="${waReceiptUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 font-semibold text-[11px] transition" title="Send Receipt">
                     <span>📱 Send Receipt</span>
                   </a>
@@ -2283,9 +2357,19 @@ document.addEventListener("DOMContentLoaded", async function() {
         showToast("Please enter a valid 10-digit Indian mobile number to message.", "error");
         return;
       }
-      const msgUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(text || "Hello from Tanker Buddy Bengaluru Dispatch.")}`;
+      const { lat, lng } = getLiveGpsCoordinates();
+      const liveGpsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+      const includeGps = document.getElementById("wa-quick-include-gps")?.checked ?? true;
+
+      let fullMsg = text || "Hello from Tanker Buddy Bengaluru Dispatch.";
+      if (includeGps) {
+        fullMsg += `\n\n📍 *Live Tanker Corridor GPS Tracking Link:*\n${liveGpsUrl}\n\n👉 *Click the link above to open and track live GPS coordinates on Google Maps!*`;
+      }
+
+      const msgUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(fullMsg)}`;
       window.open(msgUrl, "_blank", "noopener,noreferrer");
       quickText.value = "";
+      showToast("WhatsApp chat launched with live GPS tracking link!", "success");
     });
 
     // Initial update

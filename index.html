@@ -1327,11 +1327,16 @@
               </div>
             </div>
 
-            <div class="pt-2">
+            <div class="pt-2 space-y-2">
               <a id="wa-dash-test-btn" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.178.182-.077.355.101.173.449.741.963 1.199.662.59 1.22.774 1.393.86.173.086.274.072.375-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
                 <span>Open Chat with My Business Account</span>
               </a>
+              <a id="wa-dash-gps-direct-btn" href="https://www.google.com/maps?q=12.9716,77.5946" target="_blank" rel="noopener noreferrer" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-semibold text-xs flex items-center justify-center gap-2 border border-slate-700 transition">
+                <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>📍 Open Live GPS Map (Google Maps)</span>
+              </a>
+              <p class="text-[10px] text-slate-400 text-center">💬 WhatsApp message automatically embeds the live Google Maps GPS tracking link.</p>
             </div>
           </div>
 
@@ -1386,6 +1391,10 @@
                 <input type="tel" id="wa-quick-phone" maxlength="10" placeholder="Customer 10-digit phone" class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-12 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none font-mono-code">
               </div>
               <input type="text" id="wa-quick-text" placeholder="Message e.g. Tanker arriving in 15 mins" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none">
+              <div class="flex items-center gap-2 text-[11px] text-slate-300">
+                <input type="checkbox" id="wa-quick-include-gps" checked class="accent-emerald-500 rounded cursor-pointer">
+                <label for="wa-quick-include-gps" class="cursor-pointer">Include Live GPS Tracking Link (Google Maps)</label>
+              </div>
               <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs uppercase tracking-wider transition border border-emerald-700/60 flex items-center justify-center gap-1.5">
                 <span>Launch WhatsApp Chat</span>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -2138,8 +2147,8 @@
       <!-- Quick Test WhatsApp Connection -->
       <div id="bwa-test-box" class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
         <span class="text-slate-400">Test Live Connection:</span>
-        <a id="bwa-direct-test-link" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 font-semibold border border-emerald-700 flex items-center gap-1.5 transition">
-          <span>Open Chat on WhatsApp</span>
+        <a id="bwa-direct-test-link" href="#" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 font-semibold border border-emerald-700 flex items-center gap-1.5 transition">
+          <span>Open Chat with Live GPS Link</span>
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
       </div>
