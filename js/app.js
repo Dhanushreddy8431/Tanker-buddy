@@ -281,6 +281,13 @@ document.addEventListener("DOMContentLoaded", async function() {
       }
     });
 
+    // Delivery Date default to today
+    const deliveryDateInput = document.getElementById("household-delivery-date");
+    if (deliveryDateInput && !deliveryDateInput.value) {
+      deliveryDateInput.value = new Date().toISOString().slice(0, 10);
+      deliveryDateInput.min = new Date().toISOString().slice(0, 10);
+    }
+
     // Form Submit
     document.getElementById("household-order-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -289,6 +296,7 @@ document.addEventListener("DOMContentLoaded", async function() {
       const phone = form.phone.value.trim();
       const cluster = form.cluster.value;
       const address = form.address.value.trim();
+      const deliveryDate = form.deliveryDate?.value || new Date().toISOString().slice(0, 10);
       const notes = form.notes.value.trim();
 
       // Indian 10-digit mobile validation
@@ -321,11 +329,13 @@ document.addEventListener("DOMContentLoaded", async function() {
         treatment: state.householdForm.treatment,
         treatmentLabel: bill.treatmentObj.name,
         frequency: state.householdForm.frequency,
-        deliveryWindow: form.deliveryWindow?.value || "Immediate Priority (Within 90 mins)",
+        deliveryDate: deliveryDate,
+        deliveryWindow: `${deliveryDate} • Immediate Priority (Within 90 mins)`,
         hoseLength: state.householdForm.hoseLength,
         sensorRequested: state.householdForm.sensorRequested,
         estimatedPrice: bill.total,
         status: "New Lead",
+        timestamp: new Date().toISOString(),
         notes: notes,
         billBreakdown: bill
       };
@@ -334,6 +344,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const saved = await TankerDB.saveLead(leadData);
         showToast(`Order Queued! Reference ID: ${saved.id}`, "success");
         form.reset();
+        if (deliveryDateInput) deliveryDateInput.value = new Date().toISOString().slice(0, 10);
         openReceiptModal(saved, bill);
       } catch (err) {
         console.error(err);
@@ -418,6 +429,13 @@ document.addEventListener("DOMContentLoaded", async function() {
       state.rwaForm.sensorRequested = e.target.checked;
     });
 
+    // Contract Start Date default to today
+    const rwaStartDateInput = document.getElementById("rwa-start-date");
+    if (rwaStartDateInput && !rwaStartDateInput.value) {
+      rwaStartDateInput.value = new Date().toISOString().slice(0, 10);
+      rwaStartDateInput.min = new Date().toISOString().slice(0, 10);
+    }
+
     // Submit
     document.getElementById("rwa-inquiry-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -429,6 +447,7 @@ document.addEventListener("DOMContentLoaded", async function() {
       const cluster = form.cluster.value;
       const flatsCount = form.flatsCount.value;
       const sumpCapacity = form.sumpCapacity.value;
+      const startDate = form.startDate?.value || new Date().toISOString().slice(0, 10);
       const notes = form.notes.value.trim();
 
       const phoneRegex = /^[6-9]\d{9}$/;
@@ -460,12 +479,14 @@ document.addEventListener("DOMContentLoaded", async function() {
         treatment: state.rwaForm.treatment,
         treatmentLabel: bill.treatmentObj.name,
         frequency: "Daily Bulk Contract",
-        deliveryWindow: state.rwaForm.deliveryWindow,
+        deliveryDate: startDate,
+        deliveryWindow: `Start: ${startDate} • ${state.rwaForm.deliveryWindow}`,
         hoseLength: "<30 ft (Dedicated Sump Corridors)",
         sensorRequested: state.rwaForm.sensorRequested,
         estimatedPrice: bill.total,
         status: "New Lead",
-        notes: `Flats: ${flatsCount} units. Sump: ${sumpCapacity}L. Delivery: ${state.rwaForm.deliveryWindow}. Notes: ${notes}`,
+        timestamp: new Date().toISOString(),
+        notes: `Flats: ${flatsCount} units. Sump: ${sumpCapacity}L. Start Date: ${startDate}. Delivery Window: ${state.rwaForm.deliveryWindow}. Notes: ${notes}`,
         billBreakdown: bill
       };
 
@@ -473,6 +494,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const saved = await TankerDB.saveLead(leadData);
         showToast(`RWA Contract Proposal Queued! Ref: ${saved.id}`, "success");
         form.reset();
+        if (rwaStartDateInput) rwaStartDateInput.value = new Date().toISOString().slice(0, 10);
         openReceiptModal(saved, bill);
       } catch (err) {
         console.error(err);
@@ -1032,8 +1054,15 @@ document.addEventListener("DOMContentLoaded", async function() {
         tbody.innerHTML = `
           <tr>
             <td colspan="9" class="px-6 py-12 text-center text-slate-400">
-              <svg class="w-10 h-10 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              No customer leads found matching your search and filter criteria.
+              <div class="max-w-md mx-auto text-center">
+                <svg class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <h4 class="text-white text-sm font-semibold">Zero Orders in Queue</h4>
+                <p class="text-xs text-slate-400 mt-1">No fake mock data. Real customer orders placed via the booking forms or added manually will appear here in real-time.</p>
+                <button onclick="document.getElementById('admin-add-lead-btn').click()" class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  <span>➕ Add Genuine Order</span>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -1041,7 +1070,18 @@ document.addEventListener("DOMContentLoaded", async function() {
       }
 
       tbody.innerHTML = filtered.map(lead => {
-        const dateStr = lead.timestamp ? new Date(lead.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "N/A";
+        const dateObj = lead.timestamp ? new Date(lead.timestamp) : new Date();
+        const dateFormatted = dateObj.toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        });
+        const timeFormatted = dateObj.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        });
+        const dateStr = `${dateFormatted}, ${timeFormatted}`;
         const waUrl = `https://wa.me/91${lead.phone}?text=${encodeURIComponent(`Hello ${lead.customerName}, this is Tanker Buddy Dispatch regarding your water order ${lead.id}. We are coordinating your scheduled tanker delivery.`)}`;
 
         const isRwa = lead.customerType === "RWA";
@@ -1050,7 +1090,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           <tr class="border-b border-slate-800 hover:bg-slate-800/50 transition text-xs">
             <td class="px-4 py-3 font-mono-code text-slate-300">
               <div class="font-bold text-sky-400">${lead.id}</div>
-              <div class="text-[10px] text-slate-500">${dateStr}</div>
+              <div class="text-[10px] text-slate-400 font-sans mt-0.5">${dateStr}</div>
             </td>
             <td class="px-4 py-3">
               <div class="font-bold text-slate-100 flex items-center gap-1.5">
@@ -1090,9 +1130,14 @@ document.addEventListener("DOMContentLoaded", async function() {
               </select>
             </td>
             <td class="px-4 py-3 text-right">
-              <button onclick="window.viewLeadDetail('${lead.id}')" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 transition" title="View Full Inspection">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-              </button>
+              <div class="flex items-center justify-end gap-1.5">
+                <button onclick="window.viewLeadDetail('${lead.id}')" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 transition" title="Inspect Order Details">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+                <button onclick="window.deleteLeadRow('${lead.id}')" class="p-1.5 rounded bg-red-950/60 hover:bg-red-900 text-red-400 transition border border-red-800/60" title="Delete Order">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -1179,6 +1224,15 @@ document.addEventListener("DOMContentLoaded", async function() {
       modal.classList.remove("hidden");
     };
 
+    // Row Delete Handler
+    window.deleteLeadRow = async function(id) {
+      if (confirm(`Are you sure you want to delete order ${id}? This action cannot be undone.`)) {
+        await TankerDB.deleteLead(id);
+        showToast(`Order ${id} deleted successfully.`, "info");
+        renderAdminDashboard();
+      }
+    };
+
     function showAdminView() {
       adminSection?.classList.remove("hidden");
       adminSection?.scrollIntoView({ behavior: "smooth" });
@@ -1207,12 +1261,118 @@ document.addEventListener("DOMContentLoaded", async function() {
       showToast("Exported all leads to CSV format for CRM / Excel.", "success");
     });
 
-    // Reset to Seed Leads Button
-    document.getElementById("admin-reset-demo-btn")?.addEventListener("click", async () => {
-      if (confirm("Reset leads table back to default Bangalore seed dataset?")) {
-        await TankerDB.resetToDemo();
-        showToast("Leads reset to default Bengaluru pilot dataset.", "info");
+    // Clear All Orders Button (Purge fake & cached leads)
+    document.getElementById("admin-clear-all-btn")?.addEventListener("click", async () => {
+      if (confirm("Are you sure you want to delete all cached orders and reset to a clean slate? This will remove all test/mock records.")) {
+        await TankerDB.clearAllLeads();
+        showToast("All orders purged. Clean slate initialized with zero fake data.", "info");
         renderAdminDashboard();
+      }
+    });
+
+    // Add Genuine Order Modal Wiring
+    const addOrderModal = document.getElementById("admin-add-order-modal");
+    const addOrderBtn = document.getElementById("admin-add-lead-btn");
+    const addOrderCloseBtn = document.getElementById("admin-add-order-close");
+    const addOrderCancelBtn = document.getElementById("admin-add-order-cancel");
+    const addOrderForm = document.getElementById("admin-add-order-form");
+    const newDateInput = document.getElementById("admin-new-date");
+    const newVolSelect = document.getElementById("admin-new-volume");
+    const newSourceSelect = document.getElementById("admin-new-source");
+    const newTreatmentSelect = document.getElementById("admin-new-treatment");
+    const newCalcPriceDisplay = document.getElementById("admin-new-calc-price");
+
+    function getNowLocalIso() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      return now.toISOString().slice(0, 16);
+    }
+
+    function updateNewOrderPrice() {
+      if (!newVolSelect || !newSourceSelect || !newTreatmentSelect || !newCalcPriceDisplay) return;
+      const vol = parseInt(newVolSelect.value);
+      const isBulk = vol > 12000;
+      const bill = calculateBill(vol, newSourceSelect.value, newTreatmentSelect.value, isBulk);
+      newCalcPriceDisplay.textContent = `₹${bill.total.toLocaleString("en-IN")}`;
+    }
+
+    newVolSelect?.addEventListener("change", updateNewOrderPrice);
+    newSourceSelect?.addEventListener("change", updateNewOrderPrice);
+    newTreatmentSelect?.addEventListener("change", updateNewOrderPrice);
+
+    addOrderBtn?.addEventListener("click", () => {
+      if (newDateInput) newDateInput.value = getNowLocalIso();
+      updateNewOrderPrice();
+      addOrderModal?.classList.remove("hidden");
+    });
+
+    addOrderCloseBtn?.addEventListener("click", () => addOrderModal?.classList.add("hidden"));
+    addOrderCancelBtn?.addEventListener("click", () => addOrderModal?.classList.add("hidden"));
+
+    addOrderForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const customerName = document.getElementById("admin-new-cust-name").value.trim();
+      const customerType = document.getElementById("admin-new-cust-type").value;
+      const phone = document.getElementById("admin-new-phone").value.trim().replace(/\D/g, "");
+      const dateVal = document.getElementById("admin-new-date").value;
+      const cluster = document.getElementById("admin-new-cluster").value;
+      const status = document.getElementById("admin-new-status").value;
+      const address = document.getElementById("admin-new-address").value.trim();
+      const volume = parseInt(newVolSelect.value);
+      const source = newSourceSelect.value;
+      const treatment = newTreatmentSelect.value;
+      const sensorRequested = document.getElementById("admin-new-sensor").checked;
+      const notes = document.getElementById("admin-new-notes").value.trim();
+
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        showToast("Please enter a valid 10-digit Indian phone number.", "error");
+        document.getElementById("admin-new-phone").focus();
+        return;
+      }
+
+      if (!customerName || !address) {
+        showToast("Please fill in Customer Name and Delivery Address.", "error");
+        return;
+      }
+
+      const isBulk = volume > 12000;
+      const bill = calculateBill(volume, source, treatment, isBulk);
+      const genuineTimestamp = dateVal ? new Date(dateVal).toISOString() : new Date().toISOString();
+
+      const newLead = {
+        customerType: customerType,
+        customerName: customerName,
+        representativeName: customerName,
+        phone: phone,
+        cluster: cluster,
+        address: address,
+        volumeLiters: volume,
+        volumeLabel: `${volume.toLocaleString("en-IN")} Liters`,
+        source: source,
+        sourceLabel: bill.sourceObj.name,
+        treatment: treatment,
+        treatmentLabel: bill.treatmentObj.name,
+        frequency: isBulk ? "Daily Contract" : "Immediate One-Time",
+        deliveryWindow: "Scheduled Dispatch",
+        hoseLength: "<30 ft",
+        sensorRequested: sensorRequested,
+        estimatedPrice: bill.total,
+        status: status,
+        notes: notes,
+        timestamp: genuineTimestamp,
+        billBreakdown: bill
+      };
+
+      try {
+        const saved = await TankerDB.saveLead(newLead);
+        showToast(`Genuine order #${saved.id} queued successfully!`, "success");
+        addOrderForm.reset();
+        addOrderModal?.classList.add("hidden");
+        renderAdminDashboard();
+      } catch (err) {
+        console.error(err);
+        showToast("Error saving genuine order.", "error");
       }
     });
 

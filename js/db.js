@@ -72,20 +72,53 @@ const TankerDB = (function() {
     }
   }
 
-  // Initialize DB and Seed data if empty
+  // Initialize DB (Zero fake mock data, genuine data only)
   async function init() {
     await openDatabase();
     const existing = await getAllLeads();
-    if (!existing || existing.length === 0) {
-      console.log("Seeding Tanker Buddy demo leads...");
-      const seedData = (window.TANKER_BUDDY_DATA && window.TANKER_BUDDY_DATA.seedLeads) || [];
-      for (const lead of seedData) {
-        await saveLead(lead, false);
+    
+    // Aggressively purge legacy fake mock leads if present in local cache
+    const fakeMockIds = ["TB-BLR-2026-1001", "TB-BLR-2026-1002", "TB-BLR-2026-1003", "TB-BLR-2026-1004", "TB-BLR-2026-1005", "TB-BLR-2026-1006", "TB-BLR-2026-1007"];
+    const fakeNames = ["Vikram Sethi", "Aditya Sharma", "Prestige Lakeside Habitat", "Kavitha Reddy", "Rajesh Nair", "Sobha Dream Acres", "Divya Sundaram"];
+    if (existing && existing.length > 0) {
+      for (const l of existing) {
+        if (fakeMockIds.includes(l.id) || fakeNames.some(fn => (l.customerName || "").includes(fn))) {
+          await deleteLead(l.id);
+        }
       }
     }
     notifyChange();
     checkFirestoreHook();
     return true;
+  }
+
+  // Clear All Leads (Purge fake/mock data and reset to completely clean state)
+  function clearAllLeads() {
+    return new Promise(async (resolve) => {
+      saveToLocalStorage([]);
+      if (dbInstance) {
+        try {
+          const tx = dbInstance.transaction(STORE_NAME, "readwrite");
+          const store = tx.objectStore(STORE_NAME);
+          store.clear();
+          tx.oncomplete = () => {
+            notifyChange();
+            resolve(true);
+          };
+          tx.onerror = () => {
+            notifyChange();
+            resolve(true);
+          };
+        } catch (e) {
+          console.warn("Clear IDB error:", e);
+          notifyChange();
+          resolve(true);
+        }
+      } else {
+        notifyChange();
+        resolve(true);
+      }
+    });
   }
 
   // Get All Leads
@@ -348,6 +381,7 @@ const TankerDB = (function() {
     updateLeadStatus,
     deleteLead,
     resetToDemo,
+    clearAllLeads,
     subscribe,
     exportLeadsToCSV
   };
