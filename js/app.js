@@ -1434,67 +1434,82 @@ document.addEventListener("DOMContentLoaded", async function() {
   }
 
   // 10. Fleet Operations & Hubs Overview Live Refresh
-  function renderHubOperationsBoard() {
+  // 10. Fleet Operations & Hubs Overview Live Refresh (Zero fake mock data)
+  async function renderHubOperationsBoard() {
     const hubContainer = document.getElementById("fleet-hubs-container");
-    if (!hubContainer) return;
+    if (!hubContainer || !TANKER_BUDDY_DATA.hubs) return;
 
-    hubContainer.innerHTML = TANKER_BUDDY_DATA.hubs.map(hub => `
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div>
-            <h4 class="font-bold text-white text-base flex items-center gap-2">
-              ${hub.name}
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
-            </h4>
-            <p class="text-xs text-slate-400 mt-0.5">${hub.location}</p>
+    const allLeads = await TankerDB.getAllLeads();
+
+    hubContainer.innerHTML = TANKER_BUDDY_DATA.hubs.map(hub => {
+      // Calculate real genuine metrics for this hub from actual leads
+      const hubLeads = allLeads.filter(l => (hub.clusters || []).includes(l.cluster));
+      const dispatchedLeads = hubLeads.filter(l => l.driverStatus === "Delivered & Closed" || l.status === "Delivered & Closed");
+      const activeLeads = hubLeads.filter(l => l.driverStatus === "Claimed / En Route" || l.driverStatus === "At Customer Inlet / Pumping" || l.status === "Delivery Active");
+
+      const dispatchedVolume = dispatchedLeads.reduce((acc, l) => acc + (parseInt(l.volumeLiters) || 0), 0);
+      const activeTankers = activeLeads.length;
+      const refillingTankers = hubLeads.filter(l => l.status === "New Lead" || l.driverStatus === "New Lead").length;
+      const depotStandby = Math.max(0, 3 - activeTankers);
+
+      return `
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <h4 class="font-bold text-white text-base flex items-center gap-2">
+                ${hub.name}
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
+              </h4>
+              <p class="text-xs text-slate-400 mt-0.5">${hub.location}</p>
+            </div>
+            <span class="font-mono-code text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-300 border border-sky-800">Operational</span>
           </div>
-          <span class="font-mono-code text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-300 border border-sky-800">Operational</span>
+
+          <!-- Resin Bed Health & Telemetry -->
+          <div class="mt-4 space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-slate-300 mb-1">
+                <span>Ion-Exchange Resin Capacity:</span>
+                <strong class="font-mono-code text-emerald-400">${hub.resinBedHealth}%</strong>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: ${hub.resinBedHealth}%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                <span>Status: ${hub.lastRegenerated}</span>
+                <span>Brine Tank: ${hub.brineTankLevel}%</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
+              <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase block">On Corridor</span>
+                <strong class="text-base font-bold font-mono-code ${activeTankers > 0 ? 'text-amber-400' : 'text-slate-400'}">${activeTankers}</strong>
+              </div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase block">In Depot</span>
+                <strong class="text-base font-bold font-mono-code text-emerald-400">${depotStandby}</strong>
+              </div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase block">Queued</span>
+                <strong class="text-base font-bold font-mono-code ${refillingTankers > 0 ? 'text-sky-400' : 'text-slate-500'}">${refillingTankers}</strong>
+              </div>
+            </div>
+
+            <div class="pt-2 text-[11px] text-slate-400 space-y-1">
+              <div class="flex justify-between">
+                <span>BWSSB Pipeline Pressure:</span>
+                <strong class="text-slate-200 font-mono-code">${hub.bwssbIntakePressure}</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>Today's Dispatched Volume:</span>
+                <strong class="text-sky-300 font-mono-code">${dispatchedVolume.toLocaleString("en-IN")} Liters</strong>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <!-- Resin Bed Health & Telemetry -->
-        <div class="mt-4 space-y-3 text-xs">
-          <div>
-            <div class="flex justify-between text-slate-300 mb-1">
-              <span>Ion-Exchange Resin Capacity:</span>
-              <strong class="font-mono-code text-emerald-400">${hub.resinBedHealth}%</strong>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-full rounded-full" style="width: ${hub.resinBedHealth}%"></div>
-            </div>
-            <div class="flex justify-between text-[11px] text-slate-500 mt-1">
-              <span>Last regenerated: ${hub.lastRegenerated}</span>
-              <span>Brine Tank: ${hub.brineTankLevel}%</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
-            <div class="p-2 rounded bg-slate-950 border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase block">On Corridor</span>
-              <strong class="text-base font-bold font-mono-code text-sky-400">${hub.tankersActiveCorridor}</strong>
-            </div>
-            <div class="p-2 rounded bg-slate-950 border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase block">In Depot</span>
-              <strong class="text-base font-bold font-mono-code text-emerald-400">${hub.tankersInDepot}</strong>
-            </div>
-            <div class="p-2 rounded bg-slate-950 border border-slate-800">
-              <span class="text-[10px] text-slate-400 uppercase block">Refilling</span>
-              <strong class="text-base font-bold font-mono-code text-amber-400">${hub.tankersRefilling}</strong>
-            </div>
-          </div>
-
-          <div class="pt-2 text-[11px] text-slate-400 space-y-1">
-            <div class="flex justify-between">
-              <span>BWSSB Pipeline Pressure:</span>
-              <strong class="text-slate-200 font-mono-code">${hub.bwssbIntakePressure}</strong>
-            </div>
-            <div class="flex justify-between">
-              <span>Today's Dispatched Volume:</span>
-              <strong class="text-sky-300 font-mono-code">${hub.totalCapacityDispatchedToday}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   }
 
   // 11. Tanker Fleet Driver Operations Cockpit
@@ -2036,20 +2051,36 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
   }
 
-  // 13. Official Business WhatsApp Account Management
+  // 13. Official Business WhatsApp Account & Dashboard Operations
   function setupBusinessWhatsApp() {
+    const waSection = document.getElementById("whatsapp-section");
+    const waCloseBtn = document.getElementById("whatsapp-section-close-btn");
     const modal = document.getElementById("business-wa-modal");
-    const closeBtn = document.getElementById("business-wa-modal-close");
+    const modalCloseBtn = document.getElementById("business-wa-modal-close");
     const navBtn = document.getElementById("business-wa-nav-btn");
     const mobileBtn = document.getElementById("business-wa-mobile-btn");
     const dockBtn = document.getElementById("business-wa-dock-btn");
     const adminBtn = document.getElementById("admin-bwa-btn");
-    const form = document.getElementById("business-wa-form");
-    const input = document.getElementById("business-wa-input");
-    const currentDisplay = document.getElementById("bwa-modal-current-display");
-    const testLink = document.getElementById("bwa-direct-test-link");
     const navStatus = document.getElementById("nav-business-wa-status");
     const adminBadge = document.getElementById("admin-bwa-badge");
+
+    // Modal elements
+    const modalForm = document.getElementById("business-wa-form");
+    const modalInput = document.getElementById("business-wa-input");
+    const modalCurrentDisplay = document.getElementById("bwa-modal-current-display");
+    const modalTestLink = document.getElementById("bwa-direct-test-link");
+
+    // Section Dashboard elements
+    const dashPhoneDisplay = document.getElementById("wa-dash-phone-display");
+    const dashTestBtn = document.getElementById("wa-dash-test-btn");
+    const dashUpdateForm = document.getElementById("wa-dash-update-form");
+    const dashInputPhone = document.getElementById("wa-dash-input-phone");
+    const dashUseLeadBtn = document.getElementById("wa-dash-use-lead-phone-btn");
+    const quickMsgForm = document.getElementById("wa-quick-message-form");
+    const quickPhone = document.getElementById("wa-quick-phone");
+    const quickText = document.getElementById("wa-quick-text");
+    const ordersTbody = document.getElementById("wa-dash-orders-tbody");
+    const orderCountBadge = document.getElementById("wa-dash-order-count");
 
     async function getActiveBusinessNumber() {
       let num = localStorage.getItem("tanker_buddy_business_whatsapp");
@@ -2065,71 +2096,204 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     async function updateUiDisplays() {
       const num = await getActiveBusinessNumber();
+      const allLeads = await TankerDB.getAllLeads();
+
       if (num) {
-        if (currentDisplay) currentDisplay.textContent = `+91 ${num}`;
+        if (modalCurrentDisplay) modalCurrentDisplay.textContent = `+91 ${num}`;
+        if (dashPhoneDisplay) dashPhoneDisplay.textContent = `+91 ${num}`;
         if (adminBadge) adminBadge.textContent = `+91 ${num}`;
-        if (input && !input.value) input.value = num;
-        if (testLink) {
-          testLink.href = `https://wa.me/91${num}?text=${encodeURIComponent("Hello Tanker Buddy Bengaluru Dispatch! Testing verified Business WhatsApp link.")}`;
-          testLink.classList.remove("pointer-events-none", "opacity-50");
+        if (modalInput && !modalInput.value) modalInput.value = num;
+        if (dashInputPhone && !dashInputPhone.value) dashInputPhone.value = num;
+        
+        const testUrl = `https://wa.me/91${num}?text=${encodeURIComponent("Hello Tanker Buddy Bengaluru Dispatch! Testing verified Business WhatsApp link.")}`;
+        if (modalTestLink) {
+          modalTestLink.href = testUrl;
+          modalTestLink.classList.remove("pointer-events-none", "opacity-50");
+        }
+        if (dashTestBtn) {
+          dashTestBtn.href = testUrl;
+          dashTestBtn.classList.remove("pointer-events-none", "opacity-50");
         }
         if (navStatus) {
           navStatus.className = "w-2 h-2 rounded-full bg-emerald-400";
         }
       } else {
-        if (currentDisplay) currentDisplay.textContent = "Not Configured Yet";
+        if (modalCurrentDisplay) modalCurrentDisplay.textContent = "Not Configured Yet";
+        if (dashPhoneDisplay) dashPhoneDisplay.textContent = "Not Configured Yet";
         if (adminBadge) adminBadge.textContent = "Setup Required";
-        if (testLink) {
-          testLink.href = "#";
-          testLink.classList.add("pointer-events-none", "opacity-50");
+        if (modalTestLink) {
+          modalTestLink.href = "#";
+          modalTestLink.classList.add("pointer-events-none", "opacity-50");
+        }
+        if (dashTestBtn) {
+          dashTestBtn.href = "#";
+          dashTestBtn.classList.add("pointer-events-none", "opacity-50");
         }
         if (navStatus) {
           navStatus.className = "w-2 h-2 rounded-full bg-amber-400";
         }
       }
+
+      // Render Orders Queue in WhatsApp Dashboard
+      if (orderCountBadge) orderCountBadge.textContent = `${allLeads.length} Orders in Queue`;
+      if (ordersTbody) {
+        if (allLeads.length === 0) {
+          ordersTbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                <div class="max-w-md mx-auto">
+                  <div class="w-10 h-10 mx-auto rounded-full bg-emerald-950 border border-emerald-700 flex items-center justify-center text-emerald-400 text-lg mb-2">💬</div>
+                  <h4 class="text-white font-semibold text-xs">Zero Orders in WhatsApp Queue</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">When customer bookings or RWA inquiries are placed, they appear here live with 1-click WhatsApp messaging.</p>
+                </div>
+              </td>
+            </tr>
+          `;
+        } else {
+          ordersTbody.innerHTML = allLeads.map(lead => {
+            const dateStr = lead.timestamp ? new Date(lead.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Today";
+            const cleanPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+            
+            const waReceiptUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.customerName}! Tanker Buddy Dispatch confirming your water order *${lead.id}*. Volume: ${lead.volumeLabel}, Grade: ${lead.treatmentLabel}, Delivery Address: ${lead.address}, Total Payable: ₹${lead.estimatedPrice}.`)}`;
+            const waDriverUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.customerName}! Your Tanker Buddy driver has been assigned and is heading towards your location for delivery of ${lead.volumeLabel}.`)}`;
+
+            return `
+              <tr class="border-b border-slate-800 hover:bg-slate-800/40 transition">
+                <td class="px-4 py-3 font-mono-code text-slate-300">
+                  <span class="text-sky-400 font-bold block">${lead.id}</span>
+                  <span class="text-[10px] text-slate-500">${dateStr}</span>
+                </td>
+                <td class="px-4 py-3 font-semibold text-white">
+                  ${lead.customerName}
+                  <span class="block text-[10px] text-slate-400 font-normal">${lead.representativeName || lead.customerName}</span>
+                </td>
+                <td class="px-4 py-3 font-mono-code text-emerald-400 font-bold">
+                  +91 ${cleanPhone}
+                </td>
+                <td class="px-4 py-3 text-slate-300">
+                  <strong class="font-mono-code text-white">${lead.volumeLiters}L</strong>
+                  <span class="block text-[10px] text-slate-400">${lead.treatmentLabel || lead.treatment}</span>
+                </td>
+                <td class="px-4 py-3 font-mono-code font-bold text-white">
+                  ₹${(lead.estimatedPrice || 0).toLocaleString("en-IN")}
+                </td>
+                <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+                  <a href="${waReceiptUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 font-semibold text-[11px] transition" title="Send Receipt">
+                    <span>📱 Send Receipt</span>
+                  </a>
+                  <a href="${waDriverUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-700 text-sky-300 font-semibold text-[11px] transition" title="Send Driver Alert">
+                    <span>🚚 Driver Alert</span>
+                  </a>
+                </td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
+    }
+
+    function openWhatsAppDashboard() {
+      waSection?.classList.remove("hidden");
+      waSection?.scrollIntoView({ behavior: "smooth" });
+      updateUiDisplays();
+      showToast("WhatsApp Operations & Dispatch Dashboard opened.", "success");
+    }
+
+    function closeWhatsAppDashboard() {
+      waSection?.classList.add("hidden");
     }
 
     function openModal() {
       updateUiDisplays();
       modal?.classList.remove("hidden");
-      input?.focus();
+      modalInput?.focus();
     }
 
     function closeModal() {
       modal?.classList.add("hidden");
     }
 
+    window.openWhatsAppDashboard = openWhatsAppDashboard;
+    window.closeWhatsAppDashboard = closeWhatsAppDashboard;
     window.openBusinessWhatsAppModal = openModal;
     window.closeBusinessWhatsAppModal = closeModal;
 
-    navBtn?.addEventListener("click", openModal);
+    // Navigation and button click triggers: Open the WhatsApp Dashboard directly!
+    navBtn?.addEventListener("click", openWhatsAppDashboard);
     mobileBtn?.addEventListener("click", () => {
       document.getElementById("mobile-drawer")?.classList.add("hidden");
-      openModal();
+      openWhatsAppDashboard();
     });
-    dockBtn?.addEventListener("click", openModal);
-    adminBtn?.addEventListener("click", openModal);
-    closeBtn?.addEventListener("click", closeModal);
+    dockBtn?.addEventListener("click", openWhatsAppDashboard);
+    adminBtn?.addEventListener("click", openWhatsAppDashboard);
+    waCloseBtn?.addEventListener("click", closeWhatsAppDashboard);
+
+    modalCloseBtn?.addEventListener("click", closeModal);
     modal?.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
 
-    form?.addEventListener("submit", (e) => {
+    // Save number handler for Dashboard Section
+    dashUpdateForm?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const val = input.value.replace(/\D/g, "").slice(-10);
+      const val = dashInputPhone.value.replace(/\D/g, "").slice(-10);
       if (!/^[6-9]\d{9}$/.test(val)) {
         showToast("Please enter a valid 10-digit Indian WhatsApp mobile number.", "error");
         return;
       }
       localStorage.setItem("tanker_buddy_business_whatsapp", val);
       updateUiDisplays();
-      showToast(`Business WhatsApp set to +91 ${val}! All dispatches now route here.`, "success");
+      showToast(`Business WhatsApp updated to +91 ${val}!`, "success");
+    });
+
+    // Save number handler for Modal
+    modalForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = modalInput.value.replace(/\D/g, "").slice(-10);
+      if (!/^[6-9]\d{9}$/.test(val)) {
+        showToast("Please enter a valid 10-digit Indian WhatsApp mobile number.", "error");
+        return;
+      }
+      localStorage.setItem("tanker_buddy_business_whatsapp", val);
+      updateUiDisplays();
+      showToast(`Business WhatsApp set to +91 ${val}!`, "success");
       closeModal();
     });
 
-    // Auto update displays
+    // "Use Latest" button helper
+    dashUseLeadBtn?.addEventListener("click", async () => {
+      const leads = await TankerDB.getAllLeads();
+      if (leads && leads.length > 0 && leads[0].phone) {
+        const val = String(leads[0].phone).replace(/\D/g, "").slice(-10);
+        localStorage.setItem("tanker_buddy_business_whatsapp", val);
+        if (dashInputPhone) dashInputPhone.value = val;
+        updateUiDisplays();
+        showToast(`Business WhatsApp set to your latest customer number: +91 ${val}`, "success");
+      } else {
+        showToast("No recent bookings found. Please enter your 10-digit number.", "info");
+      }
+    });
+
+    // Quick direct messenger form
+    quickMsgForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const phone = quickPhone.value.replace(/\D/g, "").slice(-10);
+      const text = quickText.value.trim();
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        showToast("Please enter a valid 10-digit Indian mobile number to message.", "error");
+        return;
+      }
+      const msgUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(text || "Hello from Tanker Buddy Bengaluru Dispatch.")}`;
+      window.open(msgUrl, "_blank", "noopener,noreferrer");
+      quickText.value = "";
+    });
+
+    // Initial update
     updateUiDisplays();
-    TankerDB.subscribe(() => updateUiDisplays());
+    TankerDB.subscribe(() => {
+      updateUiDisplays();
+      renderHubOperationsBoard();
+    });
   }
 
   // Initialize all controllers

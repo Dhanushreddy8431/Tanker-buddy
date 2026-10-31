@@ -97,7 +97,7 @@
         <div class="hidden sm:flex items-center gap-2">
           <button id="business-wa-nav-btn" class="px-3 py-2 rounded-lg border border-emerald-700/70 hover:border-emerald-500 bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition">
             <svg class="w-3.5 h-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.178.182-.077.355.101.173.449.741.963 1.199.662.59 1.22.774 1.393.86.173.086.274.072.375-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
-            <span>Business WhatsApp</span>
+            <span>WhatsApp Dashboard</span>
             <span id="nav-business-wa-status" class="w-2 h-2 rounded-full bg-emerald-400"></span>
           </button>
           <button id="driver-portal-nav-btn" class="px-3 py-2 rounded-lg border border-amber-700/70 hover:border-amber-500 bg-amber-950/40 hover:bg-amber-900/60 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition">
@@ -148,7 +148,7 @@
       </div>
       <div class="space-y-2.5 pt-6 border-t border-slate-800">
         <a href="#booking-engine" class="mobile-nav-link w-full py-2.5 rounded-lg bg-sky-600 text-white font-bold text-center block text-xs">Book Delivery</a>
-        <button id="business-wa-mobile-btn" class="w-full py-2.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 font-semibold text-center block text-xs border border-emerald-700/70">💼 Business WhatsApp Setup</button>
+        <button id="business-wa-mobile-btn" class="w-full py-2.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 font-semibold text-center block text-xs border border-emerald-700/70">💬 WhatsApp Dashboard</button>
         <button id="driver-portal-mobile-btn" class="w-full py-2.5 rounded-lg bg-amber-950/60 hover:bg-amber-900 text-amber-300 font-semibold text-center block text-xs border border-amber-700/70">🚚 Tanker Driver Cockpit</button>
         <button onclick="document.getElementById('admin-passcode-modal').classList.remove('hidden'); document.getElementById('mobile-drawer').classList.add('hidden');" class="w-full py-2.5 rounded-lg bg-slate-800 text-slate-300 font-semibold text-center block text-xs border border-slate-700">Admin Operations Portal</button>
       </div>
@@ -1267,6 +1267,167 @@
     </section>
 
     <!-- =========================================================================
+         7A. BUSINESS WHATSAPP OPERATIONS & DISPATCH DASHBOARD (/whatsapp)
+         ========================================================================= -->
+    <section id="whatsapp-section" class="py-16 sm:py-20 bg-slate-950 border-b border-emerald-900/50 hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-8 border-b border-slate-800 gap-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="px-2.5 py-0.5 rounded text-xs font-mono-code font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">TB-WHATSAPP-DISPATCH</span>
+              <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 telemetry-pulse"></span>
+                Official Business WhatsApp Connected
+              </span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Business WhatsApp Operations & Dispatch Dashboard</h2>
+            <p class="text-xs text-slate-400 mt-1">Manage official WhatsApp business number, trigger 1-click customer order receipts, driver en-route updates, and direct live chats.</p>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <button id="whatsapp-section-close-btn" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span>Close Dashboard</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- WhatsApp Account Status & Settings Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-8">
+          
+          <!-- Card 1: Official Business Profile -->
+          <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-700/60 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-emerald-950 border border-emerald-500 flex items-center justify-center text-emerald-400 text-2xl">
+                  💼
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-white">Business WhatsApp</h3>
+                  <span class="text-xs text-emerald-400 font-medium">✓ Verified Municipal Dispatch</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 uppercase">Live</span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between text-slate-300">
+                <span class="text-slate-400">Account Identity:</span>
+                <strong class="text-white">Tanker Buddy Bengaluru</strong>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span class="text-slate-400">Current Dispatch Phone:</span>
+                <strong id="wa-dash-phone-display" class="font-mono-code text-emerald-400 text-sm font-bold">Not Set</strong>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span class="text-slate-400">Service Category:</span>
+                <span class="text-slate-200">Water Utility Infrastructure</span>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <a id="wa-dash-test-btn" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.178.182-.077.355.101.173.449.741.963 1.199.662.59 1.22.774 1.393.86.173.086.274.072.375-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
+                <span>Open Chat with My Business Account</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 2: Set Genuine WhatsApp Mobile -->
+          <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-sky-950 border border-sky-500 flex items-center justify-center text-sky-400 text-lg">
+                📱
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-white">Configure Dispatch Mobile</h4>
+                <p class="text-xs text-slate-400">Genuine Indian WhatsApp Number</p>
+              </div>
+            </div>
+
+            <form id="wa-dash-update-form" class="space-y-3">
+              <div>
+                <label for="wa-dash-input-phone" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Your 10-Digit WhatsApp Number</label>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-2.5 text-xs text-slate-400 font-mono-code font-bold">+91</span>
+                  <input type="tel" id="wa-dash-input-phone" maxlength="10" placeholder="e.g. 9886012345" class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-12 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none font-mono-code">
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition">
+                  Save Number
+                </button>
+                <button type="button" id="wa-dash-use-lead-phone-btn" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-semibold transition border border-slate-700">
+                  Use Latest
+                </button>
+              </div>
+              <p class="text-[10px] text-slate-500">All customer bookings and dispatch receipts will be linked to this number.</p>
+            </form>
+          </div>
+
+          <!-- Card 3: Quick Direct WhatsApp Messenger -->
+          <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-500 flex items-center justify-center text-indigo-400 text-lg">
+                💬
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-white">Direct WhatsApp Launcher</h4>
+                <p class="text-xs text-slate-400">Chat with any customer or driver instantly</p>
+              </div>
+            </div>
+
+            <form id="wa-quick-message-form" class="space-y-3">
+              <div class="relative">
+                <span class="absolute left-3.5 top-2.5 text-xs text-slate-400 font-mono-code font-bold">+91</span>
+                <input type="tel" id="wa-quick-phone" maxlength="10" placeholder="Customer 10-digit phone" class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-12 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none font-mono-code">
+              </div>
+              <input type="text" id="wa-quick-text" placeholder="Message e.g. Tanker arriving in 15 mins" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none">
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs uppercase tracking-wider transition border border-emerald-700/60 flex items-center justify-center gap-1.5">
+                <span>Launch WhatsApp Chat</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Live Customer WhatsApp Dispatch Queue Table -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+            <div>
+              <h3 class="text-base font-bold text-white">Live Customer Order WhatsApp Dispatch Queue</h3>
+              <p class="text-xs text-slate-400">One-click WhatsApp notifications for real customer orders from the platform.</p>
+            </div>
+            <span id="wa-dash-order-count" class="px-2.5 py-1 rounded bg-slate-950 text-emerald-400 font-mono-code text-xs border border-slate-800 font-bold">0 Orders</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <th class="px-4 py-3">Order Ref & Date</th>
+                  <th class="px-4 py-3">Customer / Society</th>
+                  <th class="px-4 py-3">Customer Phone</th>
+                  <th class="px-4 py-3">Volume & Grade</th>
+                  <th class="px-4 py-3">Payable</th>
+                  <th class="px-4 py-3 text-right">One-Click WhatsApp Actions</th>
+                </tr>
+              </thead>
+              <tbody id="wa-dash-orders-tbody">
+                <!-- Dynamically populated in app.js from TankerDB -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
          7. TANKER FLEET DRIVER OPERATIONS COCKPIT (/driver)
          ========================================================================= -->
     <section id="driver-section" class="py-16 sm:py-20 bg-slate-950 border-b border-slate-800 hidden">
@@ -1655,6 +1816,8 @@
         <!-- Injected via app.js -->
       </div>
     </div>
+  </div>
+
   <!-- E. Add Genuine Order Modal -->
   <div id="admin-add-order-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center hidden">
     <div class="relative w-full max-w-xl my-8 bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl">
@@ -1990,7 +2153,7 @@
   <div id="quick-dock" class="fixed bottom-6 left-6 z-30 flex flex-col sm:flex-row gap-2.5">
     <button id="business-wa-dock-btn" class="px-3.5 py-2 rounded-full bg-emerald-950/90 hover:bg-emerald-900 text-emerald-200 border border-emerald-700 hover:border-emerald-500 shadow-xl backdrop-blur-sm text-xs font-semibold flex items-center gap-2 transition">
       <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-      <span>💼 Business WhatsApp</span>
+      <span>WhatsApp Dashboard</span>
     </button>
     <button id="driver-dock-btn" class="px-3.5 py-2 rounded-full bg-amber-950/90 hover:bg-amber-900 text-amber-200 border border-amber-700 hover:border-amber-500 shadow-xl backdrop-blur-sm text-xs font-semibold flex items-center gap-2 transition">
       <span class="w-2 h-2 rounded-full bg-amber-400 telemetry-pulse"></span>

@@ -310,19 +310,16 @@ const TANKER_BUDDY_DATA = {
     }
   ],
 
-  // Hub Fleet Operations Status Board
+  // Hub Fleet Operations Status Board (Telemetry bound to live genuine orders)
   hubs: [
     {
       id: "sarjapur",
       name: "Sarjapur Hub",
       location: "Near Kodathi / Carmelaram Railway Gate, Sarjapur Road",
+      clusters: ["sarjapur", "hsr", "ecity", "bgroad"],
       resinBedHealth: 94,
-      lastRegenerated: "2 hours ago",
+      lastRegenerated: "Nominal / Active",
       brineTankLevel: 88,
-      tankersActiveCorridor: 7,
-      tankersInDepot: 4,
-      tankersRefilling: 2,
-      totalCapacityDispatchedToday: "294,000 Liters",
       bwssbIntakePressure: "3.4 Bar (Stable)",
       aquiferRechargeStatus: "Healthy (+1.2m hydrostatic head)"
     },
@@ -330,13 +327,10 @@ const TANKER_BUDDY_DATA = {
       id: "whitefield",
       name: "Whitefield Hub",
       location: "ECC Road, Near Kadugodi Metro Terminal, Whitefield",
+      clusters: ["whitefield", "krpuram", "yelahanka"],
       resinBedHealth: 91,
-      lastRegenerated: "3.5 hours ago",
+      lastRegenerated: "Nominal / Active",
       brineTankLevel: 82,
-      tankersActiveCorridor: 6,
-      tankersInDepot: 3,
-      tankersRefilling: 2,
-      totalCapacityDispatchedToday: "256,000 Liters",
       bwssbIntakePressure: "3.1 Bar (Continuous)",
       aquiferRechargeStatus: "Monitored Deep Aquifer Bed"
     },
@@ -344,13 +338,10 @@ const TANKER_BUDDY_DATA = {
       id: "bellandur",
       name: "Bellandur Hub",
       location: "Outer Ring Road, Devarabisanahalli Service Road",
+      clusters: ["bellandur", "hsr"],
       resinBedHealth: 97,
-      lastRegenerated: "45 mins ago",
+      lastRegenerated: "Nominal / Active",
       brineTankLevel: 94,
-      tankersActiveCorridor: 5,
-      tankersInDepot: 2,
-      tankersRefilling: 1,
-      totalCapacityDispatchedToday: "218,000 Liters",
       bwssbIntakePressure: "3.8 Bar (Direct High-Yield Line)",
       aquiferRechargeStatus: "Treated Hydro-basin buffer active"
     }
