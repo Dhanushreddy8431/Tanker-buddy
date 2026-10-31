@@ -11,9 +11,20 @@ const TANKER_BUDDY_DATA = {
     subheading: "Bengaluru's first tech-driven water utility. Direct Cauvery & treated aquifer supplies, centralized ion-exchange softening, and zero seasonal price gouging.",
     defaultAdminPasscode: "TankerAdminBLR2026",
     defaultDriverPasscode: "DriverBLR2026",
-    helpline: "+91 80 4736 9000",
     supportEmail: "dispatch@tankerbuddy.in",
-    operatingYear: 2026
+    operatingYear: 2026,
+    // Real Business WhatsApp Account (Dynamically bound to genuine user/dispatch number)
+    getBusinessWhatsApp: function() {
+      return localStorage.getItem("tanker_buddy_business_whatsapp") || "";
+    },
+    setBusinessWhatsApp: function(phone) {
+      if (phone) {
+        const cleaned = String(phone).replace(/\D/g, "").slice(-10);
+        localStorage.setItem("tanker_buddy_business_whatsapp", cleaned);
+        return cleaned;
+      }
+      return "";
+    }
   },
 
   // Bengaluru Delivery Clusters

@@ -433,7 +433,19 @@ const TankerDB = (function() {
     resetToDemo,
     clearAllLeads,
     subscribe,
-    exportLeadsToCSV
+    exportLeadsToCSV,
+    getBusinessWhatsApp: function() {
+      return localStorage.getItem("tanker_buddy_business_whatsapp") || "";
+    },
+    setBusinessWhatsApp: function(phone) {
+      if (phone) {
+        const cleaned = String(phone).replace(/\D/g, "").slice(-10);
+        localStorage.setItem("tanker_buddy_business_whatsapp", cleaned);
+        notifyChange();
+        return cleaned;
+      }
+      return "";
+    }
   };
 })();
 

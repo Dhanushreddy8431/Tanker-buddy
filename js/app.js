@@ -856,8 +856,23 @@ document.addEventListener("DOMContentLoaded", async function() {
     const container = document.getElementById("receipt-modal-content");
     if (!modal || !container) return;
 
-    const waText = encodeURIComponent(
-      `Hello Tanker Buddy Bengaluru Dispatch!\n\nI have just submitted a water booking request.\n*Ref ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Volume:* ${lead.volumeLabel}\n*Grade:* ${lead.treatmentLabel}\n*Cluster:* ${lead.cluster}\n*Delivery Address:* ${lead.address}\n*Total INR:* ₹${lead.estimatedPrice}\n\nPlease confirm corridor dispatch slot.`
+    // Clean phone number (10 digits)
+    const customerPhone = String(lead.phone || "").replace(/\D/g, "").slice(-10);
+
+    // If no business WhatsApp is configured yet, auto-set to customer's genuine number
+    if (!localStorage.getItem("tanker_buddy_business_whatsapp") && customerPhone) {
+      localStorage.setItem("tanker_buddy_business_whatsapp", customerPhone);
+    }
+    const businessWhatsApp = localStorage.getItem("tanker_buddy_business_whatsapp") || customerPhone;
+
+    // Message for Customer's Personal WhatsApp
+    const waTextCustomer = encodeURIComponent(
+      `Hello ${lead.customerName}! Here is your confirmed Tanker Buddy Bengaluru water booking receipt:\n\n*Reference ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Phone:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Treatment:* ${lead.treatmentLabel}\n*Source:* ${lead.sourceLabel}\n*Delivery Window:* ${lead.deliveryWindow}\n*Address:* ${lead.address}\n*Total Payable:* ₹${bill.total.toLocaleString("en-IN")}\n\nOur municipal tanker driver will coordinate with you upon arrival.`
+    );
+
+    // Message for Tanker Buddy Dispatch / Business WhatsApp
+    const waTextDispatch = encodeURIComponent(
+      `Hello Tanker Buddy Bengaluru Dispatch!\n\nI have just submitted a water booking request.\n*Ref ID:* ${lead.id}\n*Customer:* ${lead.customerName}\n*Customer WhatsApp:* +91 ${customerPhone}\n*Volume:* ${lead.volumeLabel}\n*Grade:* ${lead.treatmentLabel}\n*Cluster:* ${lead.cluster}\n*Delivery Address:* ${lead.address}\n*Total INR:* ₹${bill.total.toLocaleString("en-IN")}\n\nPlease confirm corridor dispatch slot.`
     );
 
     container.innerHTML = `
@@ -879,12 +894,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             <strong class="text-white">${lead.customerName}</strong>
           </div>
           <div class="flex justify-between text-slate-300">
-            <span>Contact Phone:</span>
-            <span class="font-mono-code text-slate-200">+91 ${lead.phone}</span>
+            <span>WhatsApp Mobile:</span>
+            <span class="font-mono-code text-emerald-400 font-bold">+91 ${customerPhone}</span>
           </div>
           <div class="flex justify-between text-slate-300">
             <span>Delivery Cluster:</span>
-            <span class="text-slate-200">${lead.cluster}</span>
+            <span class="text-slate-200 capitalize">${lead.cluster}</span>
           </div>
           <div class="flex justify-between text-slate-300">
             <span>Volume & Grade:</span>
@@ -932,13 +947,36 @@ document.addEventListener("DOMContentLoaded", async function() {
           </div>
         </div>
 
-        <div class="pt-5 flex flex-col sm:flex-row gap-3">
-          <a href="https://wa.me/918047369000?text=${waText}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 transition">
+        <!-- Business WhatsApp Dispatch Banner -->
+        <div class="mt-4 p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <div>
+              <span class="text-slate-400 text-[10px] block uppercase font-bold">Business Dispatch Account</span>
+              <strong class="font-mono-code text-emerald-400">+91 ${businessWhatsApp}</strong>
+            </div>
+          </div>
+          <button type="button" onclick="window.openBusinessWhatsAppModal()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 text-[11px] font-semibold transition border border-slate-700">
+            ⚙️ Edit Dispatch #
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-5 flex flex-col gap-2.5">
+          <a href="https://wa.me/91${customerPhone}?text=${waTextCustomer}" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.178.182-.077.355.101.173.449.741.963 1.199.662.59 1.22.774 1.393.86.173.086.274.072.375-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
-            Send to WhatsApp Dispatch
+            <span>📱 Send Receipt to My WhatsApp (+91 ${customerPhone})</span>
           </a>
-          <button onclick="document.getElementById('receipt-modal').classList.add('hidden')" class="py-2.5 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">
-            Close
+
+          ${businessWhatsApp !== customerPhone ? `
+            <a href="https://wa.me/91${businessWhatsApp}?text=${waTextDispatch}" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl bg-sky-700 hover:bg-sky-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.178.182-.077.355.101.173.449.741.963 1.199.662.59 1.22.774 1.393.86.173.086.274.072.375-.044.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
+              <span>💼 Notify Official Dispatch (+91 ${businessWhatsApp})</span>
+            </a>
+          ` : ''}
+
+          <button onclick="document.getElementById('receipt-modal').classList.add('hidden')" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">
+            Close Receipt
           </button>
         </div>
       </div>
@@ -1998,6 +2036,102 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
   }
 
+  // 13. Official Business WhatsApp Account Management
+  function setupBusinessWhatsApp() {
+    const modal = document.getElementById("business-wa-modal");
+    const closeBtn = document.getElementById("business-wa-modal-close");
+    const navBtn = document.getElementById("business-wa-nav-btn");
+    const mobileBtn = document.getElementById("business-wa-mobile-btn");
+    const dockBtn = document.getElementById("business-wa-dock-btn");
+    const adminBtn = document.getElementById("admin-bwa-btn");
+    const form = document.getElementById("business-wa-form");
+    const input = document.getElementById("business-wa-input");
+    const currentDisplay = document.getElementById("bwa-modal-current-display");
+    const testLink = document.getElementById("bwa-direct-test-link");
+    const navStatus = document.getElementById("nav-business-wa-status");
+    const adminBadge = document.getElementById("admin-bwa-badge");
+
+    async function getActiveBusinessNumber() {
+      let num = localStorage.getItem("tanker_buddy_business_whatsapp");
+      if (!num) {
+        const leads = await TankerDB.getAllLeads();
+        if (leads && leads.length > 0 && leads[0].phone) {
+          num = String(leads[0].phone).replace(/\D/g, "").slice(-10);
+          localStorage.setItem("tanker_buddy_business_whatsapp", num);
+        }
+      }
+      return num || "";
+    }
+
+    async function updateUiDisplays() {
+      const num = await getActiveBusinessNumber();
+      if (num) {
+        if (currentDisplay) currentDisplay.textContent = `+91 ${num}`;
+        if (adminBadge) adminBadge.textContent = `+91 ${num}`;
+        if (input && !input.value) input.value = num;
+        if (testLink) {
+          testLink.href = `https://wa.me/91${num}?text=${encodeURIComponent("Hello Tanker Buddy Bengaluru Dispatch! Testing verified Business WhatsApp link.")}`;
+          testLink.classList.remove("pointer-events-none", "opacity-50");
+        }
+        if (navStatus) {
+          navStatus.className = "w-2 h-2 rounded-full bg-emerald-400";
+        }
+      } else {
+        if (currentDisplay) currentDisplay.textContent = "Not Configured Yet";
+        if (adminBadge) adminBadge.textContent = "Setup Required";
+        if (testLink) {
+          testLink.href = "#";
+          testLink.classList.add("pointer-events-none", "opacity-50");
+        }
+        if (navStatus) {
+          navStatus.className = "w-2 h-2 rounded-full bg-amber-400";
+        }
+      }
+    }
+
+    function openModal() {
+      updateUiDisplays();
+      modal?.classList.remove("hidden");
+      input?.focus();
+    }
+
+    function closeModal() {
+      modal?.classList.add("hidden");
+    }
+
+    window.openBusinessWhatsAppModal = openModal;
+    window.closeBusinessWhatsAppModal = closeModal;
+
+    navBtn?.addEventListener("click", openModal);
+    mobileBtn?.addEventListener("click", () => {
+      document.getElementById("mobile-drawer")?.classList.add("hidden");
+      openModal();
+    });
+    dockBtn?.addEventListener("click", openModal);
+    adminBtn?.addEventListener("click", openModal);
+    closeBtn?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = input.value.replace(/\D/g, "").slice(-10);
+      if (!/^[6-9]\d{9}$/.test(val)) {
+        showToast("Please enter a valid 10-digit Indian WhatsApp mobile number.", "error");
+        return;
+      }
+      localStorage.setItem("tanker_buddy_business_whatsapp", val);
+      updateUiDisplays();
+      showToast(`Business WhatsApp set to +91 ${val}! All dispatches now route here.`, "success");
+      closeModal();
+    });
+
+    // Auto update displays
+    updateUiDisplays();
+    TankerDB.subscribe(() => updateUiDisplays());
+  }
+
   // Initialize all controllers
   setupHouseholdForm();
   setupRwaForm();
@@ -2006,6 +2140,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   setupLabReports();
   setupAdminDashboard();
   setupDriverDashboard();
+  setupBusinessWhatsApp();
   renderHubOperationsBoard();
   setupMobileNav();
 
