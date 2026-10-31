@@ -222,6 +222,53 @@ const TankerDB = (function() {
     return true;
   }
 
+  // Driver Claim Order
+  async function claimOrder(id, driverInfo) {
+    const leads = await getAllLeads();
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return null;
+    lead.driverAssigned = driverInfo.name;
+    lead.driverId = driverInfo.id;
+    lead.vehicleNo = driverInfo.vehicleNo;
+    lead.driverPhone = driverInfo.phone;
+    lead.driverStatus = "Claimed / En Route";
+    lead.status = "Delivery Active";
+    lead.claimedAt = new Date().toISOString();
+    await saveLead(lead, true);
+    return lead;
+  }
+
+  // Update Driver Dispatch & Delivery Status with GPS
+  async function updateDriverStatus(id, newDriverStatus, gpsData = null) {
+    const leads = await getAllLeads();
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return null;
+    lead.driverStatus = newDriverStatus;
+    if (gpsData) {
+      lead.lastGps = gpsData;
+    }
+    lead.lastUpdated = new Date().toISOString();
+    await saveLead(lead, true);
+    return lead;
+  }
+
+  // Driver Close Order with Completion Data
+  async function closeOrder(id, closureData = {}) {
+    const leads = await getAllLeads();
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return null;
+    lead.driverStatus = "Delivered & Closed";
+    lead.status = "Delivered & Closed";
+    lead.deliveredAt = new Date().toISOString();
+    lead.flowMeterEnd = closureData.meterReading || `${lead.volumeLiters} L`;
+    lead.inletVerifiedByDriver = closureData.inletVerified !== false;
+    lead.deliveryGps = closureData.gps || null;
+    lead.closureNotes = closureData.notes || "";
+    lead.paymentStatus = closureData.paymentStatus || "Verified";
+    await saveLead(lead, true);
+    return lead;
+  }
+
   // Delete Lead
   function deleteLead(id) {
     return new Promise(async (resolve) => {
@@ -379,6 +426,9 @@ const TankerDB = (function() {
     getAllLeads,
     saveLead,
     updateLeadStatus,
+    claimOrder,
+    updateDriverStatus,
+    closeOrder,
     deleteLead,
     resetToDemo,
     clearAllLeads,

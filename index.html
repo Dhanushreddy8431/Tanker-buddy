@@ -94,7 +94,11 @@
         </nav>
 
         <!-- CTA Buttons -->
-        <div class="hidden sm:flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2.5">
+          <button id="driver-portal-nav-btn" class="px-3 py-2 rounded-lg border border-amber-700/70 hover:border-amber-500 bg-amber-950/40 hover:bg-amber-900/60 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition">
+            <span class="w-2 h-2 rounded-full bg-amber-400 telemetry-pulse"></span>
+            <span>🚚 Driver Portal</span>
+          </button>
           <button id="admin-portal-nav-btn" class="px-3.5 py-2 rounded-lg border border-slate-700 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-800 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
             <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -137,8 +141,9 @@
           <a href="#pricing-calculator-section" class="mobile-nav-link py-2 hover:text-sky-400">Pricing Calculator</a>
         </div>
       </div>
-      <div class="space-y-3 pt-6 border-t border-slate-800">
+      <div class="space-y-2.5 pt-6 border-t border-slate-800">
         <a href="#booking-engine" class="mobile-nav-link w-full py-2.5 rounded-lg bg-sky-600 text-white font-bold text-center block text-xs">Book Delivery</a>
+        <button id="driver-portal-mobile-btn" class="w-full py-2.5 rounded-lg bg-amber-950/60 hover:bg-amber-900 text-amber-300 font-semibold text-center block text-xs border border-amber-700/70">🚚 Tanker Driver Cockpit</button>
         <button onclick="document.getElementById('admin-passcode-modal').classList.remove('hidden'); document.getElementById('mobile-drawer').classList.add('hidden');" class="w-full py-2.5 rounded-lg bg-slate-800 text-slate-300 font-semibold text-center block text-xs border border-slate-700">Admin Operations Portal</button>
       </div>
     </div>
@@ -1256,7 +1261,156 @@
     </section>
 
     <!-- =========================================================================
-         7. ADMINISTRATIVE OPERATIONS & FLEET DASHBOARD (/admin)
+         7. TANKER FLEET DRIVER OPERATIONS COCKPIT (/driver)
+         ========================================================================= -->
+    <section id="driver-section" class="py-16 sm:py-20 bg-slate-950 border-b border-slate-800 hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Driver Cockpit Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-8 border-b border-slate-800 gap-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="px-2.5 py-0.5 rounded text-xs font-mono-code font-bold bg-amber-950 text-amber-300 border border-amber-700">TB-DRIVER-FLEET</span>
+              <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 telemetry-pulse"></span>
+                Driver GPS Telemetry Active
+              </span>
+              <span class="text-xs text-slate-500 font-mono-code">| Passcode: <code class="text-amber-300 font-bold">DriverBLR2026</code></span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Tanker Fleet Driver Operations Cockpit</h2>
+            <p class="text-xs text-slate-400 mt-1">Dedicated mobile-first dashboard for Bengaluru tanker drivers: Pick available customer orders, navigate with GPS, and close completed deliveries.</p>
+          </div>
+
+          <!-- Driver Profile Selector & GPS Quick Action -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-2xl">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-950 border border-amber-600 flex items-center justify-center text-amber-400 text-lg shrink-0">
+                🚚
+              </div>
+              <div>
+                <label for="driver-profile-select" class="block text-[10px] uppercase font-bold text-slate-400">Current Driver Profile</label>
+                <select id="driver-profile-select" class="bg-slate-950 border border-slate-700 text-slate-100 text-xs rounded-lg px-2.5 py-1 focus:border-amber-500 outline-none font-semibold">
+                  <option value="DRV-5301">Manjunath Gowda (KA-53-E-8821 • 10,000L)</option>
+                  <option value="DRV-0104">Shivanna R. (KA-01-MJ-4019 • 6,000L)</option>
+                  <option value="DRV-5108">Raju Reddy (KA-51-AK-7110 • 12,000L)</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="driver-gps-refresh-btn" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-500 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition" title="Get Real Device GPS Coordinates">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>📍 Refresh GPS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Tanker Telemetry Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">Vehicle & Assigned Hub</span>
+              <strong id="driver-vehicle-badge" class="text-white text-sm font-mono-code font-bold block mt-0.5">KA-53-E-8821 (10,000L Tanker)</strong>
+              <span id="driver-hub-badge" class="text-xs text-sky-400">Whitefield Hub (Kadugodi / ITPL)</span>
+            </div>
+            <span class="px-2 py-1 rounded bg-amber-950 text-amber-300 text-[10px] font-mono-code border border-amber-800">READY</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">Device GPS Coordinates</span>
+              <strong id="driver-gps-display" class="text-emerald-400 text-xs font-mono-code block mt-0.5">Lat: 12.9716° N, Lng: 77.5946° E</strong>
+              <span id="driver-gps-status" class="text-[10px] text-slate-400">Bengaluru Corridor • Real Telemetry</span>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-emerald-950 border border-emerald-500 flex items-center justify-center text-emerald-400">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 telemetry-pulse"></span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">Navigation Engine</span>
+              <strong class="text-slate-100 text-xs block mt-0.5">Google Maps Direct Route</strong>
+              <span class="text-[10px] text-amber-300">Turn-by-turn directions to customer sump</span>
+            </div>
+            <span class="text-2xl">🗺️</span>
+          </div>
+        </div>
+
+        <!-- Driver Shift KPI Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 mb-8">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Available to Pick</span>
+            <strong id="driver-kpi-available" class="text-2xl font-bold font-mono-code text-amber-400 mt-1 block">0</strong>
+            <span class="text-[10px] text-slate-400 mt-1 block">Ready in dispatch pool</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider block">My Active Orders</span>
+            <strong id="driver-kpi-active" class="text-2xl font-bold font-mono-code text-sky-400 mt-1 block">0</strong>
+            <span class="text-[10px] text-sky-400 mt-1 block">Claimed / In delivery</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Delivered & Closed</span>
+            <strong id="driver-kpi-closed" class="text-2xl font-bold font-mono-code text-emerald-400 mt-1 block">0</strong>
+            <span class="text-[10px] text-emerald-400 mt-1 block">Completed shifts today</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Volume Delivered</span>
+            <strong id="driver-kpi-volume" class="text-2xl font-bold font-mono-code text-cyan-300 mt-1 block">0 L</strong>
+            <span class="text-[10px] text-slate-400 mt-1 block">Pumped into sumps</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
+            <span class="text-[11px] text-slate-400 uppercase tracking-wider block">Trip Earnings</span>
+            <strong id="driver-kpi-earnings" class="text-2xl font-bold font-mono-code text-white mt-1 block">₹0</strong>
+            <span class="text-[10px] text-slate-400 mt-1 block">Transit fee credit</span>
+          </div>
+        </div>
+
+        <!-- Driver Tabs Selector -->
+        <div class="flex border-b border-slate-800 mb-6 gap-2">
+          <button id="driver-tab-btn-available" class="driver-tab-btn px-4 py-2.5 text-xs font-bold border-b-2 border-amber-500 text-amber-400 flex items-center gap-2 transition">
+            <span>📦 Available Customer Orders</span>
+            <span id="driver-badge-available" class="px-2 py-0.2 rounded-full text-[10px] bg-amber-950 text-amber-300 border border-amber-800 font-mono-code">0</span>
+          </button>
+          <button id="driver-tab-btn-active" class="driver-tab-btn px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+            <span>🚚 My Active Deliveries</span>
+            <span id="driver-badge-active" class="px-2 py-0.2 rounded-full text-[10px] bg-sky-950 text-sky-300 border border-sky-800 font-mono-code">0</span>
+          </button>
+          <button id="driver-tab-btn-completed" class="driver-tab-btn px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+            <span>✅ Completed & Closed</span>
+            <span id="driver-badge-completed" class="px-2 py-0.2 rounded-full text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono-code">0</span>
+          </button>
+        </div>
+
+        <!-- Pane 1: Available Customer Orders -->
+        <div id="driver-pane-available" class="space-y-4">
+          <div id="driver-available-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamically populated via app.js -->
+          </div>
+        </div>
+
+        <!-- Pane 2: My Active Deliveries -->
+        <div id="driver-pane-active" class="space-y-4 hidden">
+          <div id="driver-active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dynamically populated via app.js -->
+          </div>
+        </div>
+
+        <!-- Pane 3: Completed & Closed Orders -->
+        <div id="driver-pane-completed" class="space-y-4 hidden">
+          <div id="driver-completed-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamically populated via app.js -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         8. ADMINISTRATIVE OPERATIONS & FLEET DASHBOARD (/admin)
          ========================================================================= -->
     <section id="admin-section" class="py-16 sm:py-20 bg-slate-950 border-b border-slate-800 hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1627,11 +1781,143 @@
     </div>
   </div>
 
+  <!-- F. Driver Order Closure Modal -->
+  <div id="driver-closure-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center hidden">
+    <div class="relative w-full max-w-lg my-8 bg-slate-900 border border-amber-600/60 rounded-2xl p-6 sm:p-8 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-500 flex items-center justify-center text-emerald-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Complete & Close Water Delivery</h3>
+            <p class="text-xs text-slate-400">Record flow meter reading and GPS verification to close order</p>
+          </div>
+        </div>
+        <button id="driver-closure-modal-close" type="button" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="driver-closure-form" class="space-y-4 mt-5">
+        <input type="hidden" id="closure-order-id">
+
+        <!-- Order Summary Box -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Order Reference:</span>
+            <strong id="closure-ref-display" class="font-mono-code text-sky-400">TB-BLR-xxxx</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Customer:</span>
+            <strong id="closure-customer-display" class="text-white">Customer Name</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Volume & Grade:</span>
+            <strong id="closure-volume-display" class="text-slate-200">6,000L • Softened</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Delivery Address:</span>
+            <span id="closure-address-display" class="text-slate-300 text-right truncate max-w-[240px]">Address</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="closure-meter-reading" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Flow Meter End Reading *</label>
+            <input type="text" id="closure-meter-reading" required placeholder="e.g. 148,500 L" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none font-mono-code">
+          </div>
+          <div>
+            <label for="closure-payment-status" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Payment Method Collected</label>
+            <select id="closure-payment-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:border-amber-500 outline-none">
+              <option value="Paid Online / UPI QR">Paid Online / UPI QR (₹ Verified)</option>
+              <option value="Cash Collected by Driver">Cash on Delivery Collected</option>
+              <option value="RWA Monthly Invoice">RWA Society Monthly Account</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- GPS Verification Stamp -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-slate-400 font-semibold uppercase text-[10px]">GPS Proof of Delivery Stamp</span>
+            <span class="text-emerald-400 text-[11px] font-mono-code font-bold">✓ Geo-Stamped</span>
+          </div>
+          <div id="closure-gps-stamp" class="font-mono-code text-slate-200 text-xs">
+            Coordinates: 12.9716° N, 77.5946° E • Timestamp: Live
+          </div>
+        </div>
+
+        <!-- Checkbox confirmations -->
+        <div class="space-y-2 text-xs">
+          <label class="flex items-center gap-2.5 p-2 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer">
+            <input type="checkbox" id="closure-inlet-check" checked required class="w-4 h-4 text-emerald-600 rounded bg-slate-900 border-slate-600 focus:ring-0">
+            <span class="text-slate-300">Customer inlet manifold checked and sump refilled to capacity</span>
+          </label>
+          <label class="flex items-center gap-2.5 p-2 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer">
+            <input type="checkbox" id="closure-quality-check" checked required class="w-4 h-4 text-emerald-600 rounded bg-slate-900 border-slate-600 focus:ring-0">
+            <span class="text-slate-300">Ion-exchange softened water clarity and low hardness verified</span>
+          </label>
+        </div>
+
+        <div>
+          <label for="closure-notes" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Driver Delivery Remarks</label>
+          <input type="text" id="closure-notes" placeholder="e.g. Pumped smoothly into basement sump, flow verified" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none">
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="submit" class="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Confirm Delivery & Close Order</span>
+          </button>
+          <button type="button" id="driver-closure-modal-cancel" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G. Driver Passcode Modal -->
+  <div id="driver-passcode-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-amber-600/50 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative">
+      <button id="driver-modal-close" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 mx-auto rounded-xl bg-amber-950 border border-amber-500 flex items-center justify-center text-amber-400 text-2xl mb-3">
+          🚚
+        </div>
+        <h3 class="text-lg font-bold text-white">Enter Tanker Driver Cockpit</h3>
+        <p class="text-xs text-slate-400 mt-1">Authorized municipal tanker drivers & dispatchers.</p>
+        <div class="mt-2 inline-block px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-[11px] font-mono-code text-slate-300">
+          Default Passcode: <span class="text-amber-400 font-bold">DriverBLR2026</span>
+        </div>
+      </div>
+
+      <form id="driver-passcode-form" class="space-y-4">
+        <div>
+          <label for="driver-passcode-input" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Driver Access PIN</label>
+          <input type="password" id="driver-passcode-input" required placeholder="••••••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:border-amber-500 outline-none font-mono-code">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-amber-900/40">
+          Unlock Driver Cockpit
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
 
-  <!-- Floating Admin Quick Dock (For ease of evaluation) -->
-  <div id="admin-dock" class="fixed bottom-6 left-6 z-30">
+  <!-- Floating Quick Dock for Ease of Evaluation (Driver & Admin) -->
+  <div id="quick-dock" class="fixed bottom-6 left-6 z-30 flex flex-col sm:flex-row gap-2.5">
+    <button id="driver-dock-btn" class="px-3.5 py-2 rounded-full bg-amber-950/90 hover:bg-amber-900 text-amber-200 border border-amber-700 hover:border-amber-500 shadow-xl backdrop-blur-sm text-xs font-semibold flex items-center gap-2 transition">
+      <span class="w-2 h-2 rounded-full bg-amber-400 telemetry-pulse"></span>
+      <span>🚚 Driver Cockpit</span>
+    </button>
     <button id="admin-dock-btn" class="px-3.5 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-sky-500 shadow-xl backdrop-blur-sm text-xs font-semibold flex items-center gap-2 transition">
       <span class="w-2 h-2 rounded-full bg-sky-400"></span>
       <span>Admin Portal</span>

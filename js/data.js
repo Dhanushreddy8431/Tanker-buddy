@@ -10,6 +10,7 @@ const TANKER_BUDDY_DATA = {
     tagline: "Clean Water Infrastructure • Bengaluru",
     subheading: "Bengaluru's first tech-driven water utility. Direct Cauvery & treated aquifer supplies, centralized ion-exchange softening, and zero seasonal price gouging.",
     defaultAdminPasscode: "TankerAdminBLR2026",
+    defaultDriverPasscode: "DriverBLR2026",
     helpline: "+91 80 4736 9000",
     supportEmail: "dispatch@tankerbuddy.in",
     operatingYear: 2026
@@ -341,6 +342,43 @@ const TANKER_BUDDY_DATA = {
       totalCapacityDispatchedToday: "218,000 Liters",
       bwssbIntakePressure: "3.8 Bar (Direct High-Yield Line)",
       aquiferRechargeStatus: "Treated Hydro-basin buffer active"
+    }
+  ],
+
+  // Dedicated Tanker Driver Fleet Profiles
+  driverProfiles: [
+    {
+      id: "DRV-5301",
+      name: "Manjunath Gowda",
+      phone: "9845089123",
+      vehicleNo: "KA-53-E-8821",
+      tankerCapacity: "10,000L",
+      homeHub: "whitefield",
+      hubName: "Whitefield Hub (Kadugodi / ITPL)",
+      rating: "4.9 ★ (340 deliveries)",
+      experience: "7 yrs BLR water logistics"
+    },
+    {
+      id: "DRV-0104",
+      name: "Shivanna R.",
+      phone: "9900178342",
+      vehicleNo: "KA-01-MJ-4019",
+      tankerCapacity: "6,000L",
+      homeHub: "sarjapur",
+      hubName: "Sarjapur Hub (Carmelaram / ORR)",
+      rating: "4.8 ★ (290 deliveries)",
+      experience: "5 yrs BLR water logistics"
+    },
+    {
+      id: "DRV-5108",
+      name: "Raju Reddy",
+      phone: "9741029811",
+      vehicleNo: "KA-51-AK-7110",
+      tankerCapacity: "12,000L",
+      homeHub: "bellandur",
+      hubName: "Bellandur Hub (Outer Ring Road)",
+      rating: "4.9 ★ (410 deliveries)",
+      experience: "9 yrs BLR water logistics"
     }
   ],
 

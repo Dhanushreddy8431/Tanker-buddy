@@ -40,6 +40,17 @@ document.addEventListener("DOMContentLoaded", async function() {
       searchQuery: "",
       clusterFilter: "all",
       statusFilter: "all"
+    },
+    driver: {
+      isAuthenticated: sessionStorage.getItem("tb_driver_auth") === "true",
+      activeProfileId: localStorage.getItem("tb_active_driver_id") || "DRV-5301",
+      currentTab: "available",
+      gps: {
+        lat: "12.9716",
+        lng: "77.5946",
+        accuracy: 8,
+        timestamp: new Date().toLocaleTimeString("en-IN")
+      }
     }
   };
 
@@ -1448,7 +1459,532 @@ document.addEventListener("DOMContentLoaded", async function() {
     `).join("");
   }
 
-  // 11. Mobile Drawer Navigation
+  // 11. Tanker Fleet Driver Operations Cockpit
+  function setupDriverDashboard() {
+    const driverSection = document.getElementById("driver-section");
+    const driverPassModal = document.getElementById("driver-passcode-modal");
+    const driverPassForm = document.getElementById("driver-passcode-form");
+    const driverPassInput = document.getElementById("driver-passcode-input");
+    const driverPassClose = document.getElementById("driver-modal-close");
+    const driverNavBtn = document.getElementById("driver-portal-nav-btn");
+    const driverDockBtn = document.getElementById("driver-dock-btn");
+    const driverMobileBtn = document.getElementById("driver-portal-mobile-btn");
+    const profileSelect = document.getElementById("driver-profile-select");
+    const gpsRefreshBtn = document.getElementById("driver-gps-refresh-btn");
+    const gpsDisplay = document.getElementById("driver-gps-display");
+    const gpsStatus = document.getElementById("driver-gps-status");
+    const vehicleBadge = document.getElementById("driver-vehicle-badge");
+    const hubBadge = document.getElementById("driver-hub-badge");
+
+    // Closure modal elements
+    const closureModal = document.getElementById("driver-closure-modal");
+    const closureCloseBtn = document.getElementById("driver-closure-modal-close");
+    const closureCancelBtn = document.getElementById("driver-closure-modal-cancel");
+    const closureForm = document.getElementById("driver-closure-form");
+
+    function openDriverPortal() {
+      if (state.driver.isAuthenticated) {
+        showDriverView();
+      } else {
+        driverPassModal?.classList.remove("hidden");
+        driverPassInput?.focus();
+      }
+    }
+
+    driverNavBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      openDriverPortal();
+    });
+
+    driverDockBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      openDriverPortal();
+    });
+
+    driverMobileBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("mobile-drawer")?.classList.add("hidden");
+      openDriverPortal();
+    });
+
+    driverPassClose?.addEventListener("click", () => driverPassModal?.classList.add("hidden"));
+
+    driverPassForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entered = driverPassInput.value.trim();
+      if (entered === TANKER_BUDDY_DATA.meta.defaultDriverPasscode) {
+        state.driver.isAuthenticated = true;
+        sessionStorage.setItem("tb_driver_auth", "true");
+        driverPassModal?.classList.add("hidden");
+        driverPassInput.value = "";
+        showDriverView();
+        showToast("Driver Cockpit Unlocked! Welcome to Fleet Operations.", "success");
+      } else {
+        showToast("Invalid Driver PIN. Default: DriverBLR2026", "error");
+        driverPassInput.value = "";
+      }
+    });
+
+    function showDriverView() {
+      driverSection?.classList.remove("hidden");
+      driverSection?.scrollIntoView({ behavior: "smooth" });
+      renderDriverDashboard();
+    }
+
+    // Populate Driver Profiles
+    if (profileSelect && TANKER_BUDDY_DATA.driverProfiles) {
+      profileSelect.innerHTML = TANKER_BUDDY_DATA.driverProfiles.map(d => `
+        <option value="${d.id}" ${d.id === state.driver.activeProfileId ? "selected" : ""}>
+          ${d.name} (${d.vehicleNo} • ${d.tankerCapacity})
+        </option>
+      `).join("");
+
+      profileSelect.addEventListener("change", (e) => {
+        state.driver.activeProfileId = e.target.value;
+        localStorage.setItem("tb_active_driver_id", e.target.value);
+        updateActiveDriverBadge();
+        renderDriverDashboard();
+        showToast(`Switched active tanker driver: ${profileSelect.options[profileSelect.selectedIndex].text}`, "info");
+      });
+    }
+
+    function getActiveDriver() {
+      const found = (TANKER_BUDDY_DATA.driverProfiles || []).find(d => d.id === state.driver.activeProfileId);
+      return found || {
+        id: "DRV-5301",
+        name: "Manjunath Gowda",
+        phone: "9845089123",
+        vehicleNo: "KA-53-E-8821",
+        tankerCapacity: "10,000L",
+        hubName: "Whitefield Hub (Kadugodi / ITPL)"
+      };
+    }
+
+    function updateActiveDriverBadge() {
+      const driver = getActiveDriver();
+      if (vehicleBadge) vehicleBadge.textContent = `${driver.vehicleNo} (${driver.tankerCapacity} Tanker)`;
+      if (hubBadge) hubBadge.textContent = driver.hubName;
+    }
+
+    // Real Browser GPS Geolocation
+    function fetchDeviceGps(silent = false) {
+      if ("geolocation" in navigator) {
+        if (!silent && gpsStatus) gpsStatus.textContent = "Acquiring live GPS satellite lock...";
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude.toFixed(4);
+            const lng = position.coords.longitude.toFixed(4);
+            const acc = Math.round(position.coords.accuracy);
+            state.driver.gps = {
+              lat: lat,
+              lng: lng,
+              accuracy: acc,
+              timestamp: new Date().toLocaleTimeString("en-IN")
+            };
+            if (gpsDisplay) gpsDisplay.textContent = `Lat: ${lat}° N, Lng: ${lng}° E`;
+            if (gpsStatus) gpsStatus.textContent = `Accuracy: ±${acc}m • Device GPS Locked`;
+            const stampEl = document.getElementById("closure-gps-stamp");
+            if (stampEl) stampEl.textContent = `Coordinates: ${lat}° N, ${lng}° E • Accuracy: ±${acc}m • Timestamp: ${state.driver.gps.timestamp}`;
+            if (!silent) showToast(`GPS Location Locked: ${lat}° N, ${lng}° E (±${acc}m)`, "success");
+          },
+          (err) => {
+            console.warn("Geolocation fallback:", err.message);
+            const defaultLat = "12.9716";
+            const defaultLng = "77.5946";
+            state.driver.gps = {
+              lat: defaultLat,
+              lng: defaultLng,
+              accuracy: 12,
+              timestamp: new Date().toLocaleTimeString("en-IN")
+            };
+            if (gpsDisplay) gpsDisplay.textContent = `Lat: ${defaultLat}° N, Lng: ${defaultLng}° E`;
+            if (gpsStatus) gpsStatus.textContent = `Bengaluru Tech Corridor • Geo-Simulated (±12m)`;
+            if (!silent) showToast("Live Bengaluru GPS corridor coordinates acquired.", "info");
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 15000 }
+        );
+      }
+    }
+
+    gpsRefreshBtn?.addEventListener("click", () => fetchDeviceGps(false));
+    fetchDeviceGps(true);
+    updateActiveDriverBadge();
+
+    // Driver Tab Buttons
+    const tabBtns = document.querySelectorAll(".driver-tab-btn");
+    const paneAvailable = document.getElementById("driver-pane-available");
+    const paneActive = document.getElementById("driver-pane-active");
+    const paneCompleted = document.getElementById("driver-pane-completed");
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabBtns.forEach(b => {
+          b.classList.remove("border-amber-500", "text-amber-400");
+          b.classList.add("border-transparent", "text-slate-400");
+        });
+        btn.classList.add("border-amber-500", "text-amber-400");
+        btn.classList.remove("border-transparent", "text-slate-400");
+
+        paneAvailable?.classList.add("hidden");
+        paneActive?.classList.add("hidden");
+        paneCompleted?.classList.add("hidden");
+
+        if (btn.id === "driver-tab-btn-available") {
+          paneAvailable?.classList.remove("hidden");
+          state.driver.currentTab = "available";
+        } else if (btn.id === "driver-tab-btn-active") {
+          paneActive?.classList.remove("hidden");
+          state.driver.currentTab = "active";
+        } else if (btn.id === "driver-tab-btn-completed") {
+          paneCompleted?.classList.remove("hidden");
+          state.driver.currentTab = "completed";
+        }
+      });
+    });
+
+    // Main Render Function for Driver Dashboard
+    async function renderDriverDashboard() {
+      const allLeads = await TankerDB.getAllLeads();
+      const currentDriver = getActiveDriver();
+
+      // Available Orders: Any order not closed AND not assigned to a driver yet
+      const availableOrders = allLeads.filter(l => 
+        l.status !== "Delivered & Closed" && 
+        l.driverStatus !== "Delivered & Closed" && 
+        (!l.driverId || l.driverStatus === "New Lead" || l.driverStatus === "Pending Dispatch")
+      );
+
+      // Active Orders: Assigned to current driver AND not closed
+      const activeOrders = allLeads.filter(l => 
+        (l.driverId === currentDriver.id || l.driverAssigned === currentDriver.name) &&
+        l.driverStatus !== "Delivered & Closed" &&
+        l.status !== "Delivered & Closed"
+      );
+
+      // Completed Orders: Closed deliveries by current driver
+      const completedOrders = allLeads.filter(l => 
+        (l.driverId === currentDriver.id || l.driverAssigned === currentDriver.name) &&
+        (l.driverStatus === "Delivered & Closed" || l.status === "Delivered & Closed")
+      );
+
+      // Update KPI DOM
+      const kpiAvail = document.getElementById("driver-kpi-available");
+      const kpiActive = document.getElementById("driver-kpi-active");
+      const kpiClosed = document.getElementById("driver-kpi-closed");
+      const kpiVolume = document.getElementById("driver-kpi-volume");
+      const kpiEarnings = document.getElementById("driver-kpi-earnings");
+
+      const badgeAvail = document.getElementById("driver-badge-available");
+      const badgeActive = document.getElementById("driver-badge-active");
+      const badgeCompleted = document.getElementById("driver-badge-completed");
+
+      const totalPumped = completedOrders.reduce((acc, l) => acc + (parseInt(l.volumeLiters) || 0), 0);
+      const totalEarnings = completedOrders.length * 150 + Math.round((totalPumped / 1000) * 15);
+
+      if (kpiAvail) kpiAvail.textContent = availableOrders.length;
+      if (kpiActive) kpiActive.textContent = activeOrders.length;
+      if (kpiClosed) kpiClosed.textContent = completedOrders.length;
+      if (kpiVolume) kpiVolume.textContent = `${totalPumped.toLocaleString("en-IN")} L`;
+      if (kpiEarnings) kpiEarnings.textContent = `₹${totalEarnings.toLocaleString("en-IN")}`;
+
+      if (badgeAvail) badgeAvail.textContent = availableOrders.length;
+      if (badgeActive) badgeActive.textContent = activeOrders.length;
+      if (badgeCompleted) badgeCompleted.textContent = completedOrders.length;
+
+      // 1. Render Available Orders Grid
+      const availGrid = document.getElementById("driver-available-orders-grid");
+      if (availGrid) {
+        if (availableOrders.length === 0) {
+          availGrid.innerHTML = `
+            <div class="col-span-full p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+              <div class="w-12 h-12 mx-auto rounded-full bg-amber-950/80 border border-amber-600/60 flex items-center justify-center text-amber-400 mb-3 text-xl">🚚</div>
+              <h4 class="text-white font-semibold text-sm">No Unclaimed Orders in Corridor Queue</h4>
+              <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">When customers place bookings or society RWAs request tankers, they will appear here live for driver pickup.</p>
+              <button onclick="document.getElementById('booking-engine').scrollIntoView({behavior:'smooth'})" class="mt-4 px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold">
+                Place Test Order in Booking Engine
+              </button>
+            </div>
+          `;
+        } else {
+          availGrid.innerHTML = availableOrders.map(lead => {
+            const dateStr = lead.timestamp ? new Date(lead.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "N/A";
+            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lead.address + ", Bengaluru")}`;
+            const isRwa = lead.customerType === "RWA";
+
+            return `
+              <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-2xl p-5 shadow-lg transition flex flex-col justify-between space-y-4">
+                <div>
+                  <div class="flex items-start justify-between pb-3 border-b border-slate-800">
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-mono-code text-sky-400 font-bold text-xs">${lead.id}</span>
+                        ${isRwa ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-700">RWA</span>' : '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-300">HOME</span>'}
+                      </div>
+                      <h4 class="font-bold text-white text-sm mt-0.5">${lead.customerName}</h4>
+                      <p class="text-[11px] text-slate-400">${lead.representativeName || lead.customerName}</p>
+                    </div>
+                    <span class="font-mono-code text-xs font-extrabold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
+                      ₹${(lead.estimatedPrice || 0).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+
+                  <div class="space-y-2 my-3 text-xs">
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                      <span class="text-amber-400">💧</span>
+                      <strong class="text-white font-mono-code">${(parseInt(lead.volumeLiters) || 0).toLocaleString("en-IN")} L</strong>
+                      <span class="text-slate-400">• ${lead.treatmentLabel || lead.treatment}</span>
+                    </div>
+
+                    <div class="flex items-start gap-1.5 text-slate-300">
+                      <span class="text-sky-400 shrink-0 mt-0.5">📍</span>
+                      <span class="text-slate-200 capitalize font-medium">${lead.cluster}</span>
+                      <span class="text-slate-400 truncate max-w-[170px]" title="${lead.address}">- ${lead.address}</span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 text-slate-400 text-[11px]">
+                      <span>🕒 Window:</span>
+                      <span class="text-slate-200 font-mono-code">${lead.deliveryWindow || 'Standard Corridor'}</span>
+                    </div>
+
+                    ${lead.notes ? `
+                      <div class="p-2 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300 italic">
+                        Note: "${lead.notes}"
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+
+                <!-- Action Toolbar for Driver -->
+                <div class="pt-3 border-t border-slate-800 space-y-2">
+                  <button onclick="window.claimOrderForDriver('${lead.id}')" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow shadow-amber-900/40">
+                    <span>🚚 Accept & Claim Delivery</span>
+                  </button>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <a href="${gmapsUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                      <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                      <span>GPS Route</span>
+                    </a>
+                    <a href="https://wa.me/91${lead.phone}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                      <span>💬 WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      // 2. Render Active Deliveries Grid
+      const activeGrid = document.getElementById("driver-active-orders-grid");
+      if (activeGrid) {
+        if (activeOrders.length === 0) {
+          activeGrid.innerHTML = `
+            <div class="col-span-full p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+              <div class="w-12 h-12 mx-auto rounded-full bg-sky-950/80 border border-sky-600/60 flex items-center justify-center text-sky-400 mb-3 text-xl">🧭</div>
+              <h4 class="text-white font-semibold text-sm">No Active Deliveries in Progress</h4>
+              <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">Click "Accept & Claim Delivery" from the Available Orders tab to assign orders to your tanker.</p>
+              <button onclick="document.getElementById('driver-tab-btn-available').click()" class="mt-4 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold">
+                Browse Available Orders
+              </button>
+            </div>
+          `;
+        } else {
+          activeGrid.innerHTML = activeOrders.map(lead => {
+            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lead.address + ", Bengaluru")}`;
+            const driverStatus = lead.driverStatus || "Claimed / En Route";
+            const isPumping = driverStatus.toLowerCase().includes("pumping");
+
+            return `
+              <div class="bg-slate-900 border-2 border-amber-500/80 rounded-2xl p-6 shadow-2xl space-y-5">
+                <div class="flex items-start justify-between pb-4 border-b border-slate-800">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-mono-code font-bold bg-amber-950 text-amber-300 border border-amber-700">IN-DELIVERY</span>
+                      <span class="font-mono-code text-sky-400 font-bold text-xs">${lead.id}</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold text-white mt-1">${lead.customerName}</h3>
+                    <p class="text-xs text-slate-300">${lead.address}</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-bold text-emerald-400 font-mono-code block">₹${lead.estimatedPrice}</span>
+                    <span class="text-[10px] text-slate-400">${lead.volumeLiters}L</span>
+                  </div>
+                </div>
+
+                <!-- Current Delivery Status Tracker -->
+                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Current Trip Stage:</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-bold font-mono-code ${isPumping ? 'bg-emerald-950 text-emerald-300 border border-emerald-700' : 'bg-sky-950 text-sky-300 border border-sky-700'}">
+                      ${driverStatus}
+                    </span>
+                  </div>
+
+                  <!-- Quick Stage Actions -->
+                  <div class="grid grid-cols-2 gap-2 mt-3">
+                    <button onclick="window.updateDriverOrderStatus('${lead.id}', 'In Transit / En Route')" class="py-2 px-3 rounded-lg bg-slate-900 border border-slate-700 hover:border-sky-500 text-xs font-semibold text-slate-200 transition">
+                      🚚 1. En Route
+                    </button>
+                    <button onclick="window.updateDriverOrderStatus('${lead.id}', 'At Customer Inlet / Pumping')" class="py-2 px-3 rounded-lg bg-slate-900 border border-slate-700 hover:border-sky-500 text-xs font-semibold text-slate-200 transition">
+                      🚰 2. At Inlet (Pumping)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Complete & Close Primary Button -->
+                <button onclick="window.openClosureModal('${lead.id}')" class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-900/50 flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  <span>✅ Complete & Close Order</span>
+                </button>
+
+                <!-- Navigation & Call Actions -->
+                <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800">
+                  <a href="${gmapsUrl}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                    <span>🗺️ GPS Route</span>
+                  </a>
+                  <a href="tel:+91${lead.phone}" class="py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                    <span>📞 Call</span>
+                  </a>
+                  <a href="https://wa.me/91${lead.phone}?text=${encodeURIComponent(`Hello ${lead.customerName}, Tanker Buddy driver ${currentDriver.name} is on the way with your water order ${lead.id} in vehicle ${currentDriver.vehicleNo}.`)}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                    <span>💬 WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      // 3. Render Completed Deliveries Grid
+      const completedGrid = document.getElementById("driver-completed-orders-grid");
+      if (completedGrid) {
+        if (completedOrders.length === 0) {
+          completedGrid.innerHTML = `
+            <div class="col-span-full p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+              <div class="w-12 h-12 mx-auto rounded-full bg-emerald-950/80 border border-emerald-600/60 flex items-center justify-center text-emerald-400 mb-3 text-xl">✓</div>
+              <h4 class="text-white font-semibold text-sm">No Completed Orders Yet Today</h4>
+              <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">When you finish pumping water and click "Complete & Close Order", delivery flow logs and proof receipts will appear here.</p>
+            </div>
+          `;
+        } else {
+          completedGrid.innerHTML = completedOrders.map(lead => {
+            const deliveredDateStr = lead.deliveredAt ? new Date(lead.deliveredAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Today";
+            return `
+              <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="font-mono-code text-xs font-bold text-sky-400">${lead.id}</span>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">DELIVERED</span>
+                </div>
+
+                <div>
+                  <h4 class="font-bold text-white text-sm">${lead.customerName}</h4>
+                  <p class="text-xs text-slate-300">${lead.address}</p>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs space-y-1">
+                  <div class="flex justify-between text-slate-300">
+                    <span>Delivered Time:</span>
+                    <strong class="font-mono-code text-slate-100">${deliveredDateStr}</strong>
+                  </div>
+                  <div class="flex justify-between text-slate-300">
+                    <span>Volume Pumped:</span>
+                    <strong class="font-mono-code text-cyan-300">${(parseInt(lead.volumeLiters) || 0).toLocaleString("en-IN")} L</strong>
+                  </div>
+                  <div class="flex justify-between text-slate-300">
+                    <span>Meter End Reading:</span>
+                    <span class="font-mono-code text-slate-200">${lead.flowMeterEnd || 'Recorded'}</span>
+                  </div>
+                  <div class="flex justify-between text-slate-400 text-[11px]">
+                    <span>Payment:</span>
+                    <span class="text-emerald-400">${lead.paymentStatus || 'Verified'}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+    }
+
+    // Expose Global Handlers for Driver Actions
+    window.claimOrderForDriver = async function(id) {
+      const activeDriver = getActiveDriver();
+      await TankerDB.claimOrder(id, activeDriver);
+      showToast(`Order ${id} claimed by ${activeDriver.name}! Moved to My Active Deliveries.`, "success");
+      
+      const activeTabBtn = document.getElementById("driver-tab-btn-active");
+      activeTabBtn?.click();
+      renderDriverDashboard();
+    };
+
+    window.updateDriverOrderStatus = async function(id, newStatus) {
+      await TankerDB.updateDriverStatus(id, newStatus, state.driver.gps);
+      showToast(`Status updated to: "${newStatus}"`, "info");
+      renderDriverDashboard();
+    };
+
+    window.openClosureModal = async function(id) {
+      const allLeads = await TankerDB.getAllLeads();
+      const lead = allLeads.find(l => l.id === id);
+      if (!lead) return;
+
+      document.getElementById("closure-order-id").value = lead.id;
+      document.getElementById("closure-ref-display").textContent = lead.id;
+      document.getElementById("closure-customer-display").textContent = lead.customerName;
+      document.getElementById("closure-volume-display").textContent = `${lead.volumeLiters}L • ${lead.treatmentLabel || lead.treatment}`;
+      document.getElementById("closure-address-display").textContent = lead.address;
+      document.getElementById("closure-meter-reading").value = `${(142500 + (parseInt(lead.volumeLiters) || 6000)).toLocaleString("en-IN")} L`;
+
+      const stampEl = document.getElementById("closure-gps-stamp");
+      if (stampEl) {
+        stampEl.textContent = `Coordinates: ${state.driver.gps.lat}° N, ${state.driver.gps.lng}° E • Accuracy: ±${state.driver.gps.accuracy}m • Timestamp: ${new Date().toLocaleTimeString("en-IN")}`;
+      }
+
+      closureModal?.classList.remove("hidden");
+    };
+
+    closureCloseBtn?.addEventListener("click", () => closureModal?.classList.add("hidden"));
+    closureCancelBtn?.addEventListener("click", () => closureModal?.classList.add("hidden"));
+
+    closureForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const orderId = document.getElementById("closure-order-id").value;
+      const meterReading = document.getElementById("closure-meter-reading").value.trim();
+      const paymentStatus = document.getElementById("closure-payment-status").value;
+      const notes = document.getElementById("closure-notes").value.trim();
+
+      const closureData = {
+        meterReading: meterReading,
+        paymentStatus: paymentStatus,
+        notes: notes,
+        gps: state.driver.gps,
+        inletVerified: true
+      };
+
+      await TankerDB.closeOrder(orderId, closureData);
+      closureModal?.classList.add("hidden");
+      closureForm.reset();
+      showToast(`Order ${orderId} successfully completed & closed! Water delivered.`, "success");
+
+      const completedTabBtn = document.getElementById("driver-tab-btn-completed");
+      completedTabBtn?.click();
+      renderDriverDashboard();
+    });
+
+    // Subscribe to DB changes so driver cockpit stays synchronized with new orders
+    TankerDB.subscribe(() => {
+      if (state.driver.isAuthenticated) {
+        renderDriverDashboard();
+      }
+    });
+  }
+
+  // 12. Mobile Drawer Navigation
   function setupMobileNav() {
     const mobileBtn = document.getElementById("mobile-menu-toggle");
     const mobileDrawer = document.getElementById("mobile-drawer");
@@ -1469,6 +2005,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   setupSumpSimulator();
   setupLabReports();
   setupAdminDashboard();
+  setupDriverDashboard();
   renderHubOperationsBoard();
   setupMobileNav();
 
