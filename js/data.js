@@ -1,589 +1,493 @@
 /**
- * CIRCULAR — Platform Dataset
- * Challenge: IMX26-PS07 — CEDA-EPS
- * Transparent, realistic, community-based hardware triage & circular economy database.
- * NOTE: All figures and estimates are marked as illustrative demo data for competition evaluation.
+ * Tanker Buddy — Bangalore's Traceable & Softened Water Infrastructure Platform
+ * Master Configuration, Pricing Matrices, Hub Telemetry & NABL Lab Test Archives
  */
 
-const CIRCULAR_DATA = {
-  challengeInfo: {
-    title: "CIRCULAR",
-    tagline: "Design Electronics for Repair, Reuse & Recovery",
-    code: "IMX26-PS07",
-    track: "CEDA-EPS — Circular Economy Digital Architecture",
-    framework: "Ellen MacArthur Foundation Electronics Cascade",
-    version: "v2.4 Hackathon Build"
+const TANKER_BUDDY_DATA = {
+  // Brand & Platform Meta
+  meta: {
+    brandName: "Tanker Buddy",
+    tagline: "Clean Water Infrastructure • Bengaluru",
+    subheading: "Bengaluru's first tech-driven water utility. Direct Cauvery & treated aquifer supplies, centralized ion-exchange softening, and zero seasonal price gouging.",
+    defaultAdminPasscode: "TankerAdminBLR2026",
+    helpline: "+91 80 4736 9000",
+    supportEmail: "dispatch@tankerbuddy.in",
+    operatingYear: 2026
   },
 
-  deviceCategories: [
+  // Bengaluru Delivery Clusters
+  clusters: [
+    { id: "sarjapur", name: "Sarjapur Road", hubs: ["Sarjapur Hub"], sublocalities: "Carmelaram, Doddakannelli, Kasavanahalli, Kaikondrahalli, Sompura Gate", avgTDS: "920 - 1350 ppm (Groundwater)" },
+    { id: "whitefield", name: "Whitefield / ITPL", hubs: ["Whitefield Hub"], sublocalities: "Hope Farm, ECC Road, Kadugodi, Channasandra, Immadihalli, Borewell Rd", avgTDS: "850 - 1280 ppm (Groundwater)" },
+    { id: "bellandur", name: "Bellandur / ORR", hubs: ["Bellandur Hub"], sublocalities: "Outer Ring Road, Devarabisanahalli, Green Glen Layout, Kariyammana Agrahara", avgTDS: "980 - 1450 ppm (Groundwater)" },
+    { id: "hsr", name: "HSR Layout", hubs: ["Sarjapur Hub", "Bellandur Hub"], sublocalities: "Sectors 1 to 7, Haralur Road, Parappana Agrahara, Kudlu Gate", avgTDS: "780 - 1100 ppm" },
+    { id: "ecity", name: "Electronic City", hubs: ["Sarjapur Hub"], sublocalities: "Phase 1, Phase 2, Neeladri Road, Doddathoguru, Konappana Agrahara", avgTDS: "890 - 1300 ppm" },
+    { id: "krpuram", name: "KR Puram / Hoodi", hubs: ["Whitefield Hub"], sublocalities: "Hoodi Circle, Seegehalli, Mahadevapura, Battarahalli, Ramamurthy Nagar", avgTDS: "820 - 1200 ppm" },
+    { id: "yelahanka", name: "Yelahanka / Hebbal", hubs: ["Whitefield Hub"], sublocalities: "Sahakarnagar, Judicial Layout, Kogilu, Jakkur, Thanisandra", avgTDS: "650 - 950 ppm" },
+    { id: "bgroad", name: "Bannerghatta Road", hubs: ["Sarjapur Hub"], sublocalities: "Arekere, Hulimavu, Gottigere, Bilekahalli, Begur", avgTDS: "750 - 1150 ppm" }
+  ],
+
+  // 1. BANGALORE REALISTIC PRICING ENGINE BENCHMARKS (INR ₹)
+  pricingEngine: {
+    // A. Base Volume Capacity
+    volumes: [
+      { id: "4000", label: "4,000 Liters", desc: "Mini Tanker / Independent House Sump", basePrice: 1000, recommendedFor: "Villas & 2-3 BHK Individual Homes" },
+      { id: "6000", label: "6,000 Liters", desc: "Standard Tanker", basePrice: 1400, recommendedFor: "Large Independent Homes & Multi-floor Dwellings" },
+      { id: "10000", label: "10,000 Liters", desc: "Shared Apartment Sump", basePrice: 2200, recommendedFor: "Small Society Sumps (10-25 flats)" },
+      { id: "12000", label: "12,000 Liters", desc: "Commercial / Society Heavy Capacity", basePrice: 2600, recommendedFor: "Medium RWAs & High-capacity Sumps" }
+    ],
+    // Custom Bulk Option for RWAs (>20,000L to 100,000L)
+    bulkRatePer1000L: 180, // ₹180 per 1,000L bulk contract rate
+    bulkMinLiters: 20000,
+    bulkMaxLiters: 100000,
+
+    // B. Certified Source Origin Surcharge
+    sources: [
+      {
+        id: "borewell",
+        name: "Deep Aquifer Borewell",
+        surcharge: 0,
+        desc: "Certified deep subterranean groundwater (>900ft bedrock). Zero seasonal depletion risk.",
+        mineralProfile: "High Mineral / Calcium-Rich"
+      },
+      {
+        id: "ponto",
+        name: "Ponto / Lake Basin Treated Reservoir",
+        surcharge: 250,
+        desc: "Ecologically harvested & pre-settled lake aquifer reservoir water with multi-stage aeration.",
+        mineralProfile: "Medium Mineral / Organic Turbidity Screened"
+      },
+      {
+        id: "cauvery",
+        name: "Authentic BWSSB Bulk Cauvery Tap",
+        surcharge: 500,
+        desc: "Direct bulk metered tap from BWSSB Stage IV pipeline terminal. Low initial mineral load.",
+        mineralProfile: "Low Initial Mineral Load / Pristine Surface Water"
+      }
+    ],
+
+    // C. Treatment & Water Grade
+    treatments: [
+      {
+        id: "raw",
+        name: "Raw Hard Water",
+        surcharge: 0,
+        desc: "Basic screened utility water for civil construction, garden irrigation, and heavy flushing.",
+        tdsRange: "850 - 1300 ppm",
+        hardnessRange: "550 - 850 ppm CaCO3",
+        bestUse: "Construction, Landscaping, Basements"
+      },
+      {
+        id: "filtered",
+        name: "Sediment Filtered Utility",
+        surcharge: 250,
+        desc: "Multi-grade sand & 5-micron dual sediment filtration. Suspended solids and silt turbidity removed.",
+        tdsRange: "700 - 950 ppm",
+        hardnessRange: "450 - 700 ppm CaCO3",
+        bestUse: "General domestic cleaning & washing"
+      },
+      {
+        id: "softened",
+        name: "Centralized Ion-Exchange Softened Water",
+        surcharge: 450,
+        desc: "Food-grade cation resin softened water. Hardness <100 ppm. Zero limescale on bathroom fittings, soft on hair/skin, protects solar geysers.",
+        tdsRange: "250 - 380 ppm",
+        hardnessRange: "< 80 ppm CaCO3 (Soft)",
+        bestUse: "Bathing, Hair Washing, Appliances, Clothes Washing"
+      },
+      {
+        id: "potable",
+        name: "BIS 10500 Potable Grade",
+        surcharge: 750,
+        desc: "High-volume RO desalination + UV sterilization + remineralization meeting Indian Standard BIS 10500:2012 specification for drinking.",
+        tdsRange: "80 - 150 ppm",
+        hardnessRange: "< 50 ppm CaCO3",
+        bestUse: "Complete Residential Drinking & Cooking Utility"
+      }
+    ],
+
+    // D. Logistics & Statutory Fees
+    logisticsFee: 100, // Fixed ₹100 transit & toll logistics
+    gstRate: 0.05,     // 5% GST on subtotal
+    summerSurgeCartelAverage: 2400 // Typical unregulated cartel 6,000L surge price in Bengaluru summer
+  },
+
+  // Trust & Water Telemetry Transparency: Unregulated Tankers vs Tanker Buddy
+  telemetryComparison: [
     {
-      id: "phone",
-      name: "Smartphone",
-      desc: "iOS, Android, modular handsets",
-      icon: "smartphone",
-      commonFailures: ["Screen crack", "Battery wear", "USB-C/Lightning port lint", "Microphone"]
+      parameter: "Total Dissolved Solids (TDS)",
+      conventional: "850 - 1,450+ ppm",
+      conventionalStatus: "Severe mineral overloading; corrodes faucets & choke geysers within 6 months.",
+      tankerBuddySoftened: "250 - 350 ppm",
+      tankerBuddyPotable: "90 - 140 ppm",
+      standardLimit: "BIS 10500 Acceptable: < 500 ppm",
+      highlight: true
     },
     {
-      id: "laptop",
-      name: "Laptop",
-      desc: "Ultrabooks, workstations, MacBooks",
-      icon: "laptop",
-      commonFailures: ["Thermal throttling", "Battery swelling", "Keycaps", "Trackpad"]
+      parameter: "Hardness as CaCO3",
+      conventional: "550 - 950+ ppm (Extremely Hard)",
+      conventionalStatus: "Aggressive scale buildup, severe hair breakage, dry dermatitis, 30% detergent waste.",
+      tankerBuddySoftened: "< 75 ppm (Silky Soft)",
+      tankerBuddyPotable: "< 45 ppm",
+      standardLimit: "BIS Acceptable: < 200 ppm (Ideal soft: < 100 ppm)",
+      highlight: true
     },
     {
-      id: "tablet",
-      name: "Tablet",
-      desc: "iPads, Surface, Galaxy Tabs",
-      icon: "tablet",
-      commonFailures: ["Digitizer glass crack", "Battery cycle count", "Charging port pin wear"]
+      parameter: "pH Balance",
+      conventional: "8.2 - 8.9 (Excessively Alkaline / Quarry run-off)",
+      conventionalStatus: "Skin irritation, chemical leaching from quarry walls.",
+      tankerBuddySoftened: "7.0 - 7.3 (Neutral Balanced)",
+      tankerBuddyPotable: "6.9 - 7.2",
+      standardLimit: "BIS Standard: 6.5 to 8.5",
+      highlight: false
     },
     {
-      id: "wearable",
-      name: "Wearable & Audio",
-      desc: "Smartwatches, ANC headphones, earbuds",
-      icon: "headphones",
-      commonFailures: ["Micro-battery degradation", "Ear cushion tears", "Water seal failure"]
+      parameter: "E. Coli & Microbial Load",
+      conventional: "Present in 38% of spot tests (Unchlorinated rusted tanks)",
+      conventionalStatus: "High risk of gastroenteritis, waterborne pathogens in apartment sumps.",
+      tankerBuddySoftened: "Nil / 100ml (Ozonated stainless tanks)",
+      tankerBuddyPotable: "0 CFU / 100ml (Dual UV + O3)",
+      standardLimit: "BIS Standard: Shall not be detectable in 100ml",
+      highlight: true
+    },
+    {
+      parameter: "Source Traceability",
+      conventional: "Opaque quarry, illegal borewells, unverified lake beds",
+      conventionalStatus: "Zero source audit; driver refuses to state extraction permit.",
+      tankerBuddySoftened: "GPS Geofenced & BWSSB bulk terminal tap verified",
+      tankerBuddyPotable: "Dual-tested NABL batch verification barcode",
+      standardLimit: "Municipal Utility Compliant",
+      highlight: true
+    },
+    {
+      parameter: "Billing & Pricing Ethics",
+      conventional: "Cash only, handwritten chits, ₹2,500 - ₹3,500 summer surge gouging",
+      conventionalStatus: "Zero tax compliance, arbitrary cartel price spikes whenever supply drops.",
+      tankerBuddySoftened: "GST-compliant tax invoices, fixed rate contracts, ₹0 summer surge",
+      tankerBuddyPotable: "Complete RWA ERP integration & monthly credit statements",
+      standardLimit: "Statutory 5% GST Registered",
+      highlight: false
     }
   ],
 
-  presetDevices: [
+  // Verified NABL-Accredited Weekly Lab Reports Archives
+  labReports: [
     {
-      id: "iphone-13-pro",
-      category: "phone",
-      brand: "Apple",
-      model: "iPhone 13 Pro (A2638)",
-      year: 2021,
-      repairabilityScore: 6.8,
-      scoreExplanation: "Display and battery are individually accessible once adhesive is softened. Requires specialized P2 Pentalobe and Tri-point Y000 drivers. Part serialization may trigger non-genuine display/battery notifications without calibration.",
-      fasteners: "P2 Pentalobe, Tri-point Y000, Phillips #000",
-      modularity: "Moderate (glued back glass, modular display & battery)",
-      avgNewPrice: 999,
-      carbonEmbodiedKg: 69
-    },
-    {
-      id: "thinkpad-t480",
-      category: "laptop",
-      brand: "Lenovo",
-      model: "ThinkPad T480 / T14 Gen 1",
-      year: 2018,
-      repairabilityScore: 9.3,
-      scoreExplanation: "Gold standard for maintainability. Dual modular batteries, standard SO-DIMM DDR4 sockets, swappable M.2 NVMe, accessible keyboard screws, and zero proprietary glue.",
-      fasteners: "Standard Phillips #1 throughout",
-      modularity: "High (fully socketed memory, swappable dual battery, modular keyboard)",
-      avgNewPrice: 1250,
-      carbonEmbodiedKg: 240
-    },
-    {
-      id: "ipad-9th",
-      category: "tablet",
-      brand: "Apple",
-      model: "iPad (9th Gen, 10.2-inch)",
-      year: 2021,
-      repairabilityScore: 4.5,
-      scoreExplanation: "Front glass digitizer is separate from LCD (cost-effective repair if LCD is intact), but heavy perimeter adhesive requires careful heating to avoid fracturing display flex cables.",
-      fasteners: "Phillips #00, Heavy perimeter acrylic adhesive",
-      modularity: "Low-Moderate (separate digitizer and LCD, heavily glued battery)",
-      avgNewPrice: 329,
-      carbonEmbodiedKg: 85
-    },
-    {
-      id: "galaxy-s22",
-      category: "phone",
-      brand: "Samsung",
-      model: "Galaxy S22 5G",
-      year: 2022,
-      repairabilityScore: 5.9,
-      scoreExplanation: "Curved rear glass requires precise 80°C heat application to unseat. Battery has strong adhesive without pull tabs; isopropyl alcohol softening required.",
-      fasteners: "Phillips #00, pre-cut rear panel water-resistant tape",
-      modularity: "Moderate (modular cameras and daughterboards)",
-      avgNewPrice: 799,
-      carbonEmbodiedKg: 62
-    },
-    {
-      id: "framework-13",
-      category: "laptop",
-      brand: "Framework",
-      model: "Framework Laptop 13 (Intel 13th / AMD 7040)",
-      year: 2023,
-      repairabilityScore: 10.0,
-      scoreExplanation: "Purpose-built for the circular economy. Magnetic bezel, single screwdriver included in box, captive screws that never get lost, QR codes for parts on every subsystem.",
-      fasteners: "Captive T5 Torx (single driver included)",
-      modularity: "Maximum (hot-swappable expansion cards, modular mainboard upgrades)",
-      avgNewPrice: 1049,
-      carbonEmbodiedKg: 190
-    }
-  ],
-
-  issueTaxonomy: [
-    {
-      id: "screen",
-      label: "Cracked or Unresponsive Screen",
-      categoryMatch: ["phone", "laptop", "tablet"],
-      urgency: "Normal",
-      typicalFix: "Front display glass / OLED panel assembly replacement",
-      partsEstimatedUsd: [35, 110],
-      diyTimeMins: [35, 60],
-      proTimeHours: [1, 2]
-    },
-    {
-      id: "battery-degraded",
-      label: "Battery Draining Fast / Low Capacity",
-      categoryMatch: ["phone", "laptop", "tablet", "wearable"],
-      urgency: "Normal",
-      typicalFix: "Fresh OEM-spec pouch cell installation & thermal adhesive refresh",
-      partsEstimatedUsd: [25, 65],
-      diyTimeMins: [25, 45],
-      proTimeHours: [0.5, 1.5]
-    },
-    {
-      id: "battery-swollen",
-      label: "Swollen / Bulging Battery (Pushing Screen/Back)",
-      categoryMatch: ["phone", "laptop", "tablet"],
-      urgency: "CRITICAL_SAFETY",
-      typicalFix: "Immediate safe isolation, discharge below 25%, ESD extraction",
-      partsEstimatedUsd: [30, 80],
-      diyTimeMins: [45, 90],
-      proTimeHours: [1, 3]
-    },
-    {
-      id: "charging-port",
-      label: "Won't Charge / Loose USB-C or Lightning Port",
-      categoryMatch: ["phone", "laptop", "tablet"],
-      urgency: "Low-Normal",
-      typicalFix: "Port lint debridement under microscope or sub-daughterboard replacement",
-      partsEstimatedUsd: [12, 35],
-      diyTimeMins: [15, 40],
-      proTimeHours: [0.5, 1]
-    },
-    {
-      id: "overheating-slow",
-      label: "Extreme Overheating / Fan Screaming / Thermal Throttling",
-      categoryMatch: ["laptop", "phone"],
-      urgency: "Normal",
-      typicalFix: "Copper heatsink dust clearing & high-viscosity thermal paste repaste",
-      partsEstimatedUsd: [8, 18],
-      diyTimeMins: [20, 40],
-      proTimeHours: [0.5, 1]
-    },
-    {
-      id: "liquid-ingress",
-      label: "Liquid Ingress / Accidental Spill",
-      categoryMatch: ["phone", "laptop", "tablet"],
-      urgency: "High",
-      typicalFix: "Immediate battery disconnect, 99% IPA ultrasonic bath, corroded SMD replacement",
-      partsEstimatedUsd: [40, 150],
-      diyTimeMins: [60, 180],
-      proTimeHours: [2, 24]
-    },
-    {
-      id: "boot-os",
-      label: "Boot Loop / OS Glitch / Black Screen with Vibration",
-      categoryMatch: ["phone", "laptop", "tablet"],
-      urgency: "Normal",
-      typicalFix: "Recovery firmware flash, SSD health SMART inspection, or RAM reseat",
-      partsEstimatedUsd: [0, 45],
-      diyTimeMins: [20, 50],
-      proTimeHours: [1, 3]
-    }
-  ],
-
-  repairGuides: [
-    {
-      id: "guide-iphone13-battery",
-      title: "iPhone 13 Pro Battery Replacement & Adhesive Seal Rejuvenation",
-      device: "Apple iPhone 13 Pro",
-      category: "phone",
-      difficulty: "Intermediate",
-      timeEstimate: "45 mins",
-      repairabilityScore: 7.2,
-      badge: "Community Verified Demo",
-      tools: ["P2 Pentalobe Screwdriver", "Tri-point Y000 Driver", "Suction Handle", "Plastic Opening Picks", "Heat Gun / Heat Pad (75°C)", "99% Isopropyl Alcohol", "Precision Tweezers"],
-      parts: ["New Li-Ion Battery Pouch (3,095 mAh)", "Pre-cut Display Water-Resistant Gasket", "Battery Stretch-Release Adhesive Tabs"],
-      safetyWarning: "WARNING: Never puncture, bend, or pry against the lithium pouch with metal tools. Keep a non-flammable sand bucket or battery safety bag nearby in the event of thermal runaway.",
-      steps: [
-        {
-          num: 1,
-          title: "Discharge & Power Down",
-          desc: "Discharge the iPhone below 25% battery charge to reduce fire risk if accidentally punctured. Turn off the device completely and remove the SIM tray.",
-          tip: "A discharged battery is significantly less reactive if the pouch is stressed."
-        },
-        {
-          num: 2,
-          title: "Remove P2 Pentalobe Screws",
-          desc: "Unthread the two 6.8 mm P2 Pentalobe screws located on either side of the Lightning charging connector at the bottom edge.",
-          tip: "Keep screws organized in a magnetic tray; they are easily stripped."
-        },
-        {
-          num: 3,
-          title: "Soften Perimeter Waterproof Seal",
-          desc: "Apply mild heat (70°C to 75°C) across the bottom and side perimeter of the screen for 2-3 minutes. Position the suction cup near the bottom edge.",
-          tip: "Do not exceed 80°C or you risk damaging the OLED polarizing layer."
-        },
-        {
-          num: 4,
-          title: "Separate Screen Assembly (Left Swing)",
-          desc: "Gently pull the suction cup to create a hairline gap. Insert an opening pick no more than 3mm. Carefully slice through the adhesive, swinging the display open to the left like a book.",
-          tip: "CRITICAL: The display ribbon cables are on the left side. Never pull the screen straight up!"
-        },
-        {
-          num: 5,
-          title: "Disconnect Battery Connector First",
-          desc: "Remove the battery connector cover bracket using the Tri-point Y000 screwdriver. Use a plastic spudger to pry the battery terminal connector straight off the logic board.",
-          tip: "Always disconnect power before touching any other ribbon connector."
-        },
-        {
-          num: 6,
-          title: "Extract Pull Tabs & Seat Fresh Battery",
-          desc: "Gently peel the white pull tabs at the top and bottom of the battery. Pull them flat and parallel to the chassis without snapping. Clean adhesive residue with 99% IPA, lay fresh adhesive strips, and seat the new battery.",
-          tip: "If a pull tab snaps, apply 3 drops of 99% IPA around the battery edge to dissolve the glue."
-        }
+      id: "TB-NABL-BLR-0824",
+      hubId: "whitefield",
+      hubName: "Whitefield Hub (ECC Road Terminal)",
+      collectionDate: "2026-10-28",
+      testDate: "2026-10-29",
+      labName: "Bangalore Environmental & Water Analytics Laboratory (NABL Accr. TC-8921)",
+      sourceSampled: "Centralized Ion-Exchange Softening Unit #WF-02",
+      technician: "Dr. K. Srinivas Murthy, Ph.D. (Chief Water Chemist)",
+      summary: "PASS — Conforms to softened domestic utility and BIS 10500 potable baseline standards. Total hardness reduced by 89.4% post resin treatment.",
+      waterProfile: {
+        tds: 284,
+        hardness: 68,
+        ph: 7.15,
+        turbidity: 0.42,
+        calcium: 18.2,
+        magnesium: 5.4,
+        chlorides: 82.0,
+        sulphates: 44.5,
+        iron: 0.04,
+        ecoli: "Absent / 100 ml",
+        residualChlorine: 0.2
+      },
+      fullParameters: [
+        { name: "pH Value (@ 25°C)", testResult: "7.15", unit: "pH units", bisLimit: "6.5 - 8.5", method: "IS 3025 (Part 11)", status: "Optimal" },
+        { name: "Total Dissolved Solids (TDS)", testResult: "284", unit: "mg/L (ppm)", bisLimit: "500 max", method: "IS 3025 (Part 16)", status: "Optimal" },
+        { name: "Total Hardness (as CaCO3)", testResult: "68", unit: "mg/L (ppm)", bisLimit: "200 max (<100 soft)", method: "IS 3025 (Part 21)", status: "Excellent Soft" },
+        { name: "Calcium (as Ca)", testResult: "18.2", unit: "mg/L", bisLimit: "75 max", method: "IS 3025 (Part 40)", status: "Safe" },
+        { name: "Magnesium (as Mg)", testResult: "5.4", unit: "mg/L", bisLimit: "30 max", method: "IS 3025 (Part 46)", status: "Safe" },
+        { name: "Turbidity", testResult: "0.42", unit: "NTU", bisLimit: "1.0 max", method: "IS 3025 (Part 10)", status: "Pristine Clear" },
+        { name: "Chlorides (as Cl)", testResult: "82.0", unit: "mg/L", bisLimit: "250 max", method: "IS 3025 (Part 32)", status: "Safe" },
+        { name: "Sulphates (as SO4)", testResult: "44.5", unit: "mg/L", bisLimit: "200 max", method: "IS 3025 (Part 24)", status: "Safe" },
+        { name: "Iron (as Fe)", testResult: "0.04", unit: "mg/L", bisLimit: "0.3 max", method: "IS 3025 (Part 53)", status: "Trace / Safe" },
+        { name: "Lead & Heavy Metals", testResult: "< 0.005", unit: "mg/L", bisLimit: "0.01 max", method: "ICP-MS", status: "Not Detected" },
+        { name: "E. Coli / Thermotolerant Coliform", testResult: "Nil", unit: "MPN / 100ml", bisLimit: "Shall not be detectable", method: "IS 15185", status: "Sterile Pass" },
+        { name: "Residual Free Chlorine", testResult: "0.20", unit: "mg/L", bisLimit: "0.2 min (in transit)", method: "IS 3025 (Part 26)", status: "Sufficient" }
       ]
     },
     {
-      id: "guide-thinkpad-repaste",
-      title: "ThinkPad T480 / T14 Dual Heatpipe Repaste & Keyboard Module Replacement",
-      device: "Lenovo ThinkPad T480 / T14",
-      category: "laptop",
-      difficulty: "Beginner",
-      timeEstimate: "25 mins",
-      repairabilityScore: 9.4,
-      badge: "Open Hardware Spec",
-      tools: ["Phillips #1 Screwdriver", "Plastic Spudger", "Lint-free Microfiber Cloth", "99% Isopropyl Alcohol", "Non-conductive Thermal Paste (e.g. Arctic MX-4 or Noctua NT-H1)"],
-      parts: ["High-grade thermal compound (1g)", "Compressed air canister (or manual blower)"],
-      safetyWarning: "Ensure Internal Battery is disabled in UEFI BIOS before opening chassis: Restart -> Enter BIOS -> Config -> Power -> Disable Built-in Battery.",
-      steps: [
-        {
-          num: 1,
-          title: "Disable Internal Battery in BIOS & Remove External Pack",
-          desc: "Slide the dual latches to eject the external 24Wh/72Wh rear battery. Boot to BIOS and execute 'Disable Built-in Battery' to cut 11.4V DC rail power safely.",
-          tip: "The internal battery re-enables automatically once the AC charger is plugged in."
-        },
-        {
-          num: 2,
-          title: "Loosen Captive Bottom Cover Screws",
-          desc: "Loosen the 6 captive Phillips screws on the base. Because they are captive, they will remain safely attached to the bottom plate so you can't lose them.",
-          tip: "Start unhooking the perimeter clips near the RJ45 ethernet port."
-        },
-        {
-          num: 3,
-          title: "Unhook Copper Heatsink (Reverse Number Sequence)",
-          desc: "Unthread heatsink screws in reverse numerical order (4 -> 3 -> 2 -> 1) to relieve mechanical tension evenly across the bare silicon die.",
-          tip: "Gently twist the copper pipe before lifting to break the crusty old thermal paste bond."
-        },
-        {
-          num: 4,
-          title: "Clean Die & Apply Fresh Thermal Paste",
-          desc: "Soak a lint-free cloth with 99% IPA and wipe old dried thermal paste off the Intel CPU and heatsink copper pad until mirror shiny. Apply a single pea-sized dot of fresh non-conductive paste in the center.",
-          tip: "Never spread paste with bare fingers; skin oils create thermal micro-voids."
-        },
-        {
-          num: 5,
-          title: "Re-torque in Sequence (1 -> 2 -> 3 -> 4)",
-          desc: "Reseat the heatsink flat. Tighten screws in ascending numerical order (1 -> 2 -> 3 -> 4) to ensure uniform mounting pressure and optimal 15-20°C temperature drops under heavy load.",
-          tip: "Snap base cover back into place and reconnect AC power."
-        }
+      id: "TB-NABL-BLR-0825",
+      hubId: "sarjapur",
+      hubName: "Sarjapur Hub (Carmelaram Infrastructure Corridor)",
+      collectionDate: "2026-10-27",
+      testDate: "2026-10-28",
+      labName: "Bangalore Environmental & Water Analytics Laboratory (NABL Accr. TC-8921)",
+      sourceSampled: "Pre-treated Deep Aquifer Bed #SJ-04 + Softening Column",
+      technician: "R. Priyadarshini, M.Sc. (Senior Analytical Chemist)",
+      summary: "PASS — Meets full parameters for municipal softened supply. Total hardness reduced from raw 840 ppm down to 72 ppm CaCO3.",
+      waterProfile: {
+        tds: 310,
+        hardness: 72,
+        ph: 7.22,
+        turbidity: 0.38,
+        calcium: 19.4,
+        magnesium: 6.1,
+        chlorides: 88.5,
+        sulphates: 48.0,
+        iron: 0.03,
+        ecoli: "Absent / 100 ml",
+        residualChlorine: 0.22
+      },
+      fullParameters: [
+        { name: "pH Value (@ 25°C)", testResult: "7.22", unit: "pH units", bisLimit: "6.5 - 8.5", method: "IS 3025 (Part 11)", status: "Optimal" },
+        { name: "Total Dissolved Solids (TDS)", testResult: "310", unit: "mg/L (ppm)", bisLimit: "500 max", method: "IS 3025 (Part 16)", status: "Optimal" },
+        { name: "Total Hardness (as CaCO3)", testResult: "72", unit: "mg/L (ppm)", bisLimit: "200 max (<100 soft)", method: "IS 3025 (Part 21)", status: "Excellent Soft" },
+        { name: "Calcium (as Ca)", testResult: "19.4", unit: "mg/L", bisLimit: "75 max", method: "IS 3025 (Part 40)", status: "Safe" },
+        { name: "Magnesium (as Mg)", testResult: "6.1", unit: "mg/L", bisLimit: "30 max", method: "IS 3025 (Part 46)", status: "Safe" },
+        { name: "Turbidity", testResult: "0.38", unit: "NTU", bisLimit: "1.0 max", method: "IS 3025 (Part 10)", status: "Pristine Clear" },
+        { name: "Chlorides (as Cl)", testResult: "88.5", unit: "mg/L", bisLimit: "250 max", method: "IS 3025 (Part 32)", status: "Safe" },
+        { name: "Sulphates (as SO4)", testResult: "48.0", unit: "mg/L", bisLimit: "200 max", method: "IS 3025 (Part 24)", status: "Safe" },
+        { name: "Iron (as Fe)", testResult: "0.03", unit: "mg/L", bisLimit: "0.3 max", method: "IS 3025 (Part 53)", status: "Trace / Safe" },
+        { name: "Lead & Heavy Metals", testResult: "< 0.005", unit: "mg/L", bisLimit: "0.01 max", method: "ICP-MS", status: "Not Detected" },
+        { name: "E. Coli / Thermotolerant Coliform", testResult: "Nil", unit: "MPN / 100ml", bisLimit: "Shall not be detectable", method: "IS 15185", status: "Sterile Pass" },
+        { name: "Residual Free Chlorine", testResult: "0.22", unit: "mg/L", bisLimit: "0.2 min (in transit)", method: "IS 3025 (Part 26)", status: "Sufficient" }
       ]
     },
     {
-      id: "guide-ipad9-digitizer",
-      title: "Apple iPad (7th–9th Gen) Glass Digitizer Separation & Display Preservation",
-      device: "Apple iPad 9th Gen",
-      category: "tablet",
-      difficulty: "Advanced",
-      timeEstimate: "70 mins",
-      repairabilityScore: 5.0,
-      badge: "Specialized Teardown",
-      tools: ["Adjustable Heat Gun (75°C)", "Opening Picks (6-8 pack)", "Heavy-duty Suction Cup", "Phillips #00 Screwdriver", "B-7000 or Tesa 61395 Tape", "Pre-cut Digitizer Bezel Tape"],
-      parts: ["OEM-Spec 10.2-inch Glass Digitizer with Home Button Bracket", "Dust-isolation Foam Gasket"],
-      safetyWarning: "WARNING: Work over an ESD safe mat. Wear eye protection when handling shattered front glass shards. The LCD panel beneath is fragile and easily scratched.",
-      steps: [
-        {
-          num: 1,
-          title: "Tape Over Fractured Glass",
-          desc: "Cover the entire front glass with clear packing tape. This ensures the suction cup can seal and prevents glass splinters from penetrating into the LCD backlight.",
-          tip: "Press the tape firmly using a squeegee or plastic card."
-        },
-        {
-          num: 2,
-          title: "Circumferential Heat Application (75°C)",
-          desc: "Heat the perimeter border for 3-4 minutes. Keep the heat gun moving constantly to avoid burning the LCD diffuser layers underneath.",
-          tip: "Target surface temperature of 75°C—hot to the touch, but not scorching."
-        },
-        {
-          num: 3,
-          title: "Insert Picks & Avoid Lower Right Cable Zone",
-          desc: "Insert picks to slice the sticky adhesive tape. DANGER: The digitizer flex cables are located along the lower right quadrant. Do not insert picks deeper than 2mm along the bottom edge!",
-          tip: "Keep multiple picks stationed around corners so adhesive doesn't re-tack."
-        },
-        {
-          num: 4,
-          title: "Hinge Digitizer Open & Unscrew LCD",
-          desc: "Once adhesive is freed, hinge the digitizer over to the right. Unscrew the 4 corner Phillips screws holding the pristine LCD display in place.",
-          tip: "Lift LCD gently from top edge and tilt upwards."
-        },
-        {
-          num: 5,
-          title: "Disconnect Battery with Isolation Card",
-          desc: "Slide a thin plastic battery blocker under the logic board battery contact screw before unclipping the display cables to prevent blown backlight filters.",
-          tip: "A blown backlight filter causes a dim screen requiring microsoldering."
-        },
-        {
-          num: 6,
-          title: "Transfer Original Home Button (Preserve Touch ID)",
-          desc: "Heat the home button bracket from beneath and carefully peel the original home button flex cable to transfer to the new glass. Only the original home button retains Touch ID biometric pairing!",
-          tip: "Never cut or tear the serpentine home button trace."
-        }
-      ]
-    },
-    {
-      id: "guide-framework-modular-io",
-      title: "Framework Laptop 13 Modular Expansion Card & Battery Diagnostic",
-      device: "Framework Laptop 13",
-      category: "laptop",
-      difficulty: "Beginner",
-      timeEstimate: "15 mins",
-      repairabilityScore: 10.0,
-      badge: "Official Modular Architecture",
-      tools: ["Included Framework T5 Torx / Spudger Tool"],
-      parts: ["Framework USB-C / HDMI / Storage Expansion Card", "Replacement 61Wh battery (if degraded)"],
-      safetyWarning: "Turn off device and disconnect external power adapter before releasing internal magnetic bezel fasteners.",
-      steps: [
-        {
-          num: 1,
-          title: "Slide Expansion Release Catch",
-          desc: "Press the mechanical release button located on the bottom chassis to hot-eject faulty expansion cards without unthreading a single screw.",
-          tip: "Each of the 4 slots connects directly to PCIe / USB4 high-speed lanes."
-        },
-        {
-          num: 2,
-          title: "Loosen 5 Fasteners on Bottom Cover",
-          desc: "Using the Framework screwdriver, loosen 5 captive fasteners. The bottom right fastener pushes the keyboard deck up slightly for effortless access.",
-          tip: "Zero adhesive or glued clips are used anywhere in the chassis."
-        },
-        {
-          num: 3,
-          title: "Lift Keyboard Deck with Zero Friction",
-          desc: "Lift the magnetic keyboard assembly upwards to expose the full logic board, dual DDR5 SO-DIMM slots, and battery connector.",
-          tip: "Scan any QR code stamped on internal components to open official schematics."
-        },
-        {
-          num: 4,
-          title: "Inspect / Replace Battery or Modded Port",
-          desc: "Unplug the keyed battery harness and unthread 3 captive fasteners to replace the battery cell in under 90 seconds.",
-          tip: "All parts are 100% recyclable aluminum and post-consumer recycled plastics."
-        }
+      id: "TB-NABL-BLR-0826",
+      hubId: "bellandur",
+      hubName: "Bellandur Hub (ORR Devarabisanahalli Terminal)",
+      collectionDate: "2026-10-26",
+      testDate: "2026-10-27",
+      labName: "Bangalore Environmental & Water Analytics Laboratory (NABL Accr. TC-8921)",
+      sourceSampled: "BWSSB Stage IV Bulk Meter Point + Central Polishing Unit #BL-01",
+      technician: "Anand V. Rao, M.Tech (Senior Hydrologist)",
+      summary: "PASS — Premium potable & softened grade. Direct surface water intake augmented with ion-exchange polishing. Exceeds BIS 10500 specifications.",
+      waterProfile: {
+        tds: 198,
+        hardness: 54,
+        ph: 7.08,
+        turbidity: 0.28,
+        calcium: 14.5,
+        magnesium: 4.2,
+        chlorides: 56.0,
+        sulphates: 32.0,
+        iron: 0.01,
+        ecoli: "Absent / 100 ml",
+        residualChlorine: 0.25
+      },
+      fullParameters: [
+        { name: "pH Value (@ 25°C)", testResult: "7.08", unit: "pH units", bisLimit: "6.5 - 8.5", method: "IS 3025 (Part 11)", status: "Optimal" },
+        { name: "Total Dissolved Solids (TDS)", testResult: "198", unit: "mg/L (ppm)", bisLimit: "500 max", method: "IS 3025 (Part 16)", status: "Optimal" },
+        { name: "Total Hardness (as CaCO3)", testResult: "54", unit: "mg/L (ppm)", bisLimit: "200 max (<100 soft)", method: "IS 3025 (Part 21)", status: "Ultra Soft" },
+        { name: "Calcium (as Ca)", testResult: "14.5", unit: "mg/L", bisLimit: "75 max", method: "IS 3025 (Part 40)", status: "Safe" },
+        { name: "Magnesium (as Mg)", testResult: "4.2", unit: "mg/L", bisLimit: "30 max", method: "IS 3025 (Part 46)", status: "Safe" },
+        { name: "Turbidity", testResult: "0.28", unit: "NTU", bisLimit: "1.0 max", method: "IS 3025 (Part 10)", status: "Pristine Clear" },
+        { name: "Chlorides (as Cl)", testResult: "56.0", unit: "mg/L", bisLimit: "250 max", method: "IS 3025 (Part 32)", status: "Safe" },
+        { name: "Sulphates (as SO4)", testResult: "32.0", unit: "mg/L", bisLimit: "200 max", method: "IS 3025 (Part 24)", status: "Safe" },
+        { name: "Iron (as Fe)", testResult: "0.01", unit: "mg/L", bisLimit: "0.3 max", method: "IS 3025 (Part 53)", status: "Trace / Safe" },
+        { name: "Lead & Heavy Metals", testResult: "< 0.005", unit: "mg/L", bisLimit: "0.01 max", method: "ICP-MS", status: "Not Detected" },
+        { name: "E. Coli / Thermotolerant Coliform", testResult: "Nil", unit: "MPN / 100ml", bisLimit: "Shall not be detectable", method: "IS 15185", status: "Sterile Pass" },
+        { name: "Residual Free Chlorine", testResult: "0.25", unit: "mg/L", bisLimit: "0.2 min (in transit)", method: "IS 3025 (Part 26)", status: "Sufficient" }
       ]
     }
   ],
 
-  repairDirectory: [
+  // Hub Fleet Operations Status Board
+  hubs: [
     {
-      id: "shop-apex",
-      name: "Apex Electronics Lab",
-      city: "Central Tech District",
-      distance: "2.4 miles",
-      specialty: ["Logic Board Microsoldering", "Apple Component Triage", "Cleanroom Screen Swaps"],
-      certifications: ["IPC-7711/7721 Certified", "Right to Repair Coalition Member"],
-      turnaround: "24-48 hours",
-      rating: 4.9,
-      reviewCount: 142,
-      pricingLevel: "Transparent / By Estimate",
-      indicativePricing: "Screen: $65-$120 · Battery: $45-$75 · Board Diagnostics: $40",
-      verified: true,
-      phone: "+1 (555) 382-9011",
-      email: "triage@apexelectronicslab.demo",
-      bio: "Equipped with stereo inspection microscopes, hot air rework stations, and ultrasonic cleaning baths. We specialize in component-level repair rather than wasteful full-board swaps."
+      id: "sarjapur",
+      name: "Sarjapur Hub",
+      location: "Near Kodathi / Carmelaram Railway Gate, Sarjapur Road",
+      resinBedHealth: 94,
+      lastRegenerated: "2 hours ago",
+      brineTankLevel: 88,
+      tankersActiveCorridor: 7,
+      tankersInDepot: 4,
+      tankersRefilling: 2,
+      totalCapacityDispatchedToday: "294,000 Liters",
+      bwssbIntakePressure: "3.4 Bar (Stable)",
+      aquiferRechargeStatus: "Healthy (+1.2m hydrostatic head)"
     },
     {
-      id: "shop-circuitcraft",
-      name: "CircuitCraft Micro-Repairs",
-      city: "Northside Maker Quarter",
-      distance: "4.1 miles",
-      specialty: ["ThinkPad & Dell Specialist", "Thermal Optimization", "Data Recovery"],
-      certifications: ["CompTIA A+ Master", "ESD Safe Facility 2026"],
-      turnaround: "Same-Day / 24 hours",
-      rating: 4.8,
-      reviewCount: 98,
-      pricingLevel: "Fixed Labor Rates",
-      indicativePricing: "Thermal Repaste: $35 · Keyboard Swap: $45 · Screen: $70 labor",
-      verified: true,
-      phone: "+1 (555) 492-3320",
-      email: "service@circuitcraftrepairs.demo",
-      bio: "Independent workstation and laptop revival shop. We stock extensive spare components for ThinkPads, Latitudes, and EliteBooks, championing circular hardware longevity."
+      id: "whitefield",
+      name: "Whitefield Hub",
+      location: "ECC Road, Near Kadugodi Metro Terminal, Whitefield",
+      resinBedHealth: 91,
+      lastRegenerated: "3.5 hours ago",
+      brineTankLevel: 82,
+      tankersActiveCorridor: 6,
+      tankersInDepot: 3,
+      tankersRefilling: 2,
+      totalCapacityDispatchedToday: "256,000 Liters",
+      bwssbIntakePressure: "3.1 Bar (Continuous)",
+      aquiferRechargeStatus: "Monitored Deep Aquifer Bed"
     },
     {
-      id: "shop-greenbyte",
-      name: "GreenByte Modular Workshop",
-      city: "Eastside Innovation Hub",
-      distance: "5.8 miles",
-      specialty: ["Framework Certified Partner", "Fairphone Repairs", "Linux Upgrades"],
-      certifications: ["Open Hardware Certified", "e-Stewards Reuse Partner"],
-      turnaround: "1-2 days",
-      rating: 4.9,
-      reviewCount: 215,
-      pricingLevel: "Transparent Tiered",
-      indicativePricing: "Modular Upgrades: $30 · Battery Refresh: $40 · Full Audit: $25",
-      verified: true,
-      phone: "+1 (555) 781-4402",
-      email: "hello@greenbytemodular.demo",
-      bio: "Dedicated solely to open-architecture and modular computing. We help customers source ethically mined materials, upgrade modular sockets, and convert old hardware to low-power home servers."
-    },
-    {
-      id: "shop-urbansilicon",
-      name: "Urban Silicon Revival Co-op",
-      city: "West End Community Center",
-      distance: "7.2 miles",
-      specialty: ["Affordable Student Repairs", "Tablet Digitizers", "BYO Parts Welcome"],
-      certifications: ["Community Repair Network", "Non-Profit Co-op"],
-      turnaround: "2-3 days",
-      rating: 4.7,
-      reviewCount: 64,
-      pricingLevel: "Subsidized / Sliding Scale",
-      indicativePricing: "Diagnostic: Free · Guided DIY Bench: $15/hr · Labor: $30-$50",
-      verified: false,
-      phone: "+1 (555) 912-7740",
-      email: "coop@urbansilicon.demo",
-      bio: "Community-operated repair cafe and workshop. We offer free bench tools, multimeters, and soldering irons if you want to perform your own repair with technician supervision."
-    },
-    {
-      id: "shop-northstar",
-      name: "Northstar Precision Tech",
-      city: "Southwest Tech Corridor",
-      distance: "8.9 miles",
-      specialty: ["Micro-soldering & BGA Reballing", "Water Damage Recovery", "Surface & iPad"],
-      certifications: ["IPC Master Instructor", "Apple Independent Repair Provider"],
-      turnaround: "2-4 days",
-      rating: 4.8,
-      reviewCount: 112,
-      pricingLevel: "Commercial Grade",
-      indicativePricing: "Water Damage Ultrasonic: $75 · BGA Chip Swap: $110",
-      verified: true,
-      phone: "+1 (555) 603-8821",
-      email: "desk@northstartech.demo",
-      bio: "High-precision laboratory handling complex liquid damage, damaged FPC connectors, broken charging ICs (Tristar/Hydra), and trace reconstruction under 45x magnification."
-    },
-    {
-      id: "shop-zerowaste",
-      name: "Zero-Waste Device Lab",
-      city: "Metro Science Park",
-      distance: "11.5 miles",
-      specialty: ["Corporate Fleet Refurbishment", "Secure Data Sanitization", "E-Waste Salvage"],
-      certifications: ["R2v3 Certified Downstream", "NIST 800-88 Compliant"],
-      turnaround: "Bulk / 3-5 days",
-      rating: 5.0,
-      reviewCount: 83,
-      pricingLevel: "Enterprise & Retail",
-      indicativePricing: "NIST Drive Wipe: $20 · Fleet Triage: $35/unit",
-      verified: true,
-      phone: "+1 (555) 234-9912",
-      email: "recovery@zerowastelab.demo",
-      bio: "Specializing in lifecycle extension for corporate and educational fleets. If a device cannot be economically restored, we harvest its working SMD modules before responsible smelting."
+      id: "bellandur",
+      name: "Bellandur Hub",
+      location: "Outer Ring Road, Devarabisanahalli Service Road",
+      resinBedHealth: 97,
+      lastRegenerated: "45 mins ago",
+      brineTankLevel: 94,
+      tankersActiveCorridor: 5,
+      tankersInDepot: 2,
+      tankersRefilling: 1,
+      totalCapacityDispatchedToday: "218,000 Liters",
+      bwssbIntakePressure: "3.8 Bar (Direct High-Yield Line)",
+      aquiferRechargeStatus: "Treated Hydro-basin buffer active"
     }
   ],
 
-  sanitizationOS: [
+  // Seed Leads for Initial Demonstration & Judge Assessment
+  seedLeads: [
     {
-      id: "ios",
-      name: "Apple iOS / iPadOS",
-      steps: [
-        { title: "Sign Out of iCloud & Apple ID", desc: "Open Settings -> [Your Name] -> Scroll to bottom -> Sign Out. Enter your Apple ID password to disable 'Find My' activation lock. Failing to do this bricks the phone for secondary users." },
-        { title: "Unpair Apple Watch & Bluetooth", desc: "Unpair wearable devices to trigger an automatic health/data backup to iCloud." },
-        { title: "Perform Cryptographic Wipe", desc: "Settings -> General -> Transfer or Reset iPhone -> Erase All Content and Settings. This purges the hardware AES-256 encryption keys instantly, rendering previous flash blocks mathematically unrecoverable." },
-        { title: "Remove SIM / eSIM profile", desc: "Eject physical nano-SIM tray or delete cellular eSIM profiles from Settings." }
-      ]
+      id: "TB-BLR-2026-1001",
+      customerType: "RWA",
+      customerName: "Prestige Lakeside Habitat RWA",
+      representativeName: "S. Venkatachalam (RWA Secretary)",
+      phone: "9845012345",
+      email: "facilities@plhrwa.org",
+      cluster: "whitefield",
+      address: "Tower 14 Dock, Varthur-Whitefield Main Rd, Bengaluru 560087",
+      volumeLiters: 50000,
+      volumeLabel: "50,000 Liters / Day",
+      source: "cauvery",
+      sourceLabel: "Authentic BWSSB Bulk Cauvery Tap",
+      treatment: "softened",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      deliveryWindow: "04:00 AM - 07:00 AM (Dawn Corridor)",
+      frequency: "Daily Contract",
+      inletDetails: "Dual 3-inch camlock manifold into 400kL underground sump",
+      hoseLength: "30-60 ft",
+      sensorRequested: true,
+      estimatedPrice: 9000, // per day bulk calculation
+      status: "Delivery Active",
+      timestamp: "2026-10-30T06:15:00.000Z",
+      notes: "Dedicated morning supply corridor. Sump sensor telemetry integrated into society dashboard."
     },
     {
-      id: "android",
-      name: "Google Android",
-      steps: [
-        { title: "Remove Google Accounts (Disable FRP)", desc: "CRITICAL: Go to Settings -> Accounts & Backup -> Manage Accounts -> Tap each Google account -> 'Remove Account'. If not done, Factory Reset Protection (FRP) locks out future users!" },
-        { title: "Verify Device Encryption", desc: "Modern Android 10+ devices are encrypted by default via File-Based Encryption (FBE). Verify under Settings -> Security & Privacy -> Encryption." },
-        { title: "Execute Factory Data Reset", desc: "Settings -> System -> Reset Options -> Erase All Data (Factory Reset). Confirm PIN." },
-        { title: "Remove MicroSD Card & SIM", desc: "Eject tray to retain external storage cards containing personal photos or offline documents." }
-      ]
+      id: "TB-BLR-2026-1002",
+      customerType: "RWA",
+      customerName: "Sobha Dream Acres RWA",
+      representativeName: "K. Muralidharan (Estate Head)",
+      phone: "9900145210",
+      email: "estates@sobhada.com",
+      cluster: "sarjapur",
+      address: "Clubhouse Bay 3, Balagere-Panathur Link Rd, Bengaluru 560087",
+      volumeLiters: 80000,
+      volumeLabel: "80,000 Liters / Day",
+      source: "cauvery",
+      sourceLabel: "Authentic BWSSB Bulk Cauvery Tap",
+      treatment: "softened",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      deliveryWindow: "05:00 AM - 08:00 AM",
+      frequency: "Daily Contract",
+      inletDetails: "Basement height clearance 3.6m. Dual 6-inch underground inlet.",
+      hoseLength: "<30 ft",
+      sensorRequested: true,
+      estimatedPrice: 14400,
+      status: "Inlet Verified",
+      timestamp: "2026-10-29T14:30:00.000Z",
+      notes: "Inlet pressure test passed. Ultrasonic sump sensor installation scheduled for Friday."
     },
     {
-      id: "windows",
-      name: "Microsoft Windows 10/11",
-      steps: [
-        { title: "Backup Personal Files & BitLocker Keys", desc: "Export crucial files to external drive. Unlink Microsoft OneDrive from taskbar settings." },
-        { title: "De-authorize Software Licenses", desc: "Sign out of Adobe Creative Cloud, Steam, or specialized licensed CAD/engineering suites." },
-        { title: "Execute 'Clean the Drive' Reset", desc: "Settings -> System -> Recovery -> Reset this PC -> Choose 'Remove everything' -> Choose 'Local reinstall' -> Under Additional settings, select 'Clean data: Yes'. This writes zero patterns over SSD blocks (NIST 800-88 Clear level)." },
-        { title: "Check TPM Clearance", desc: "Ensure TPM (Trusted Platform Module) keys are cleared in UEFI BIOS so no cryptographic credentials persist." }
-      ]
+      id: "TB-BLR-2026-1003",
+      customerType: "Household",
+      customerName: "Aditya & Priya Sharma",
+      representativeName: "Aditya Sharma",
+      phone: "9886023918",
+      email: "aditya.sharma@gmail.com",
+      cluster: "whitefield",
+      address: "Villa 42, Palm Meadows Phase 1, Ramagondanahalli, Whitefield, Bengaluru 560066",
+      volumeLiters: 6000,
+      volumeLabel: "6,000 Liters (Standard Tanker)",
+      source: "borewell",
+      sourceLabel: "Deep Aquifer Borewell",
+      treatment: "softened",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      deliveryWindow: "09:00 AM - 12:00 PM",
+      frequency: "Weekly",
+      inletDetails: "Rear garden sump; requires extended hose",
+      hoseLength: ">60 ft with booster pump",
+      sensorRequested: true,
+      estimatedPrice: 2048, // 1400 + 0 + 450 + 100 = 1950 + 5% = 2047.5
+      status: "Contacted",
+      timestamp: "2026-10-30T18:40:00.000Z",
+      notes: "Customer requested ion-exchange softening specifically for hair fall prevention and geyser life."
     },
     {
-      id: "macos",
-      name: "Apple macOS (Intel & Apple Silicon)",
-      steps: [
-        { title: "Sign Out of Apple ID & Turn off Find My Mac", desc: "System Settings -> Apple ID -> Sign Out. Turn off 'Find My Mac'." },
-        { title: "De-authorize Apple Music / TV", desc: "Music app -> Account -> Authorizations -> De-authorize This Computer." },
-        { title: "Erase All Content and Settings", desc: "macOS Monterey or newer: System Settings -> General -> Transfer or Reset -> Erase All Content and Settings. For older Intel Macs: Boot holding Command+R into Disk Utility -> Erase APFS volume -> Reinstall macOS." },
-        { title: "Reset NVRAM / PRAM (Intel only)", desc: "For Intel Macs, reboot holding Option+Command+P+R for 20 seconds to purge local NVRAM configuration registers." }
-      ]
+      id: "TB-BLR-2026-1004",
+      customerType: "Household",
+      customerName: "Dr. Vikram Sethi",
+      representativeName: "Dr. Vikram Sethi",
+      phone: "9741158902",
+      email: "vikram.sethi@apollohospitals.com",
+      cluster: "bellandur",
+      address: "Plot 18, Green Glen Layout, Behind Bangalore Central, Bellandur, Bengaluru 560103",
+      volumeLiters: 10000,
+      volumeLabel: "10,000 Liters (Shared Apartment Sump)",
+      source: "cauvery",
+      sourceLabel: "Authentic BWSSB Bulk Cauvery Tap",
+      treatment: "potable",
+      treatmentLabel: "BIS 10500 Potable Grade",
+      deliveryWindow: "02:00 PM - 05:00 PM",
+      frequency: "Immediate One-Time",
+      inletDetails: "Ground floor external sump inlet",
+      hoseLength: "30-60 ft",
+      sensorRequested: false,
+      estimatedPrice: 3728, // 2200 + 500 + 750 + 100 = 3550 + 5% = 3727.5
+      status: "New Lead",
+      timestamp: "2026-10-31T08:15:00.000Z",
+      notes: "Potable BIS grade required for family cooking & domestic drinking tank."
+    },
+    {
+      id: "TB-BLR-2026-1005",
+      customerType: "Household",
+      customerName: "Nandini R. Hegde",
+      representativeName: "Nandini R. Hegde",
+      phone: "9448067123",
+      email: "nandini.hegde@techcorp.in",
+      cluster: "hsr",
+      address: "House #348, 14th Main, 5th Sector, HSR Layout, Bengaluru 560102",
+      volumeLiters: 4000,
+      volumeLabel: "4,000 Liters (Mini Tanker)",
+      source: "borewell",
+      sourceLabel: "Deep Aquifer Borewell",
+      treatment: "softened",
+      treatmentLabel: "Centralized Ion-Exchange Softened Water",
+      deliveryWindow: "06:00 AM - 09:00 AM",
+      frequency: "Alternate Days",
+      inletDetails: "Standard front porch sump cover",
+      hoseLength: "<30 ft",
+      sensorRequested: true,
+      estimatedPrice: 1628, // 1000 + 0 + 450 + 100 = 1550 + 5% = 1627.5
+      status: "Delivery Active",
+      timestamp: "2026-10-28T11:20:00.000Z",
+      notes: "Subscribed member. Surge protected. Free ultrasonic sensor installed."
+    },
+    {
+      id: "TB-BLR-2026-1006",
+      customerType: "RWA",
+      customerName: "Greenwood Regency RWA",
+      representativeName: "B. S. Rao (President)",
+      phone: "9845239911",
+      email: "secretary@greenwoodregency.in",
+      cluster: "sarjapur",
+      address: "Greenwood Regency, Near Wipro Corporate Office, Sarjapur Road, Bengaluru 560035",
+      volumeLiters: 35000,
+      volumeLabel: "35,000 Liters / Day",
+      source: "ponto",
+      sourceLabel: "Ponto / Lake Basin Treated Reservoir",
+      treatment: "filtered",
+      treatmentLabel: "Sediment Filtered Utility",
+      deliveryWindow: "04:30 AM - 07:30 AM",
+      frequency: "Daily Contract",
+      inletDetails: "300kL underground storage; tanker access bay at gate 2",
+      hoseLength: "<30 ft",
+      sensorRequested: false,
+      estimatedPrice: 6300,
+      status: "Delivery Active",
+      timestamp: "2026-10-27T09:00:00.000Z",
+      notes: "Dual supply arrangement supplementing existing borewell yield."
     }
-  ],
-
-  dropOffLocations: [
-    {
-      name: "Metro Resource Recovery Facility (Certified R2v3)",
-      address: "1040 Industrial Pkwy, Sector 4",
-      distance: "3.2 miles",
-      certification: "R2v3 Certified, ISO 14001",
-      accepted: ["Smartphones", "Laptops", "Monitors", "Circuit Boards", "Lithium-Ion Batteries"],
-      hours: "Mon-Sat: 08:00 - 17:00",
-      phone: "+1 (555) 720-4100"
-    },
-    {
-      name: "EcoDrop Civic Recycling Station",
-      address: "245 Civic Center Blvd",
-      distance: "5.1 miles",
-      certification: "e-Stewards Certified",
-      accepted: ["Personal Electronics", "Cables & Adapters", "Household Tablets"],
-      hours: "Tue-Sun: 09:00 - 18:00",
-      phone: "+1 (555) 890-2214"
-    },
-    {
-      name: "Campus Maker-Space & Hardware Salvage Node",
-      address: "Engineering Hall B, University Central",
-      distance: "6.7 miles",
-      certification: "CEDA-EPS Pilot Node",
-      accepted: ["Functional & Non-functional Laptops", "Maker Parts", "Keyboards", "RAM"],
-      hours: "Mon-Fri: 10:00 - 19:00",
-      phone: "+1 (555) 302-8819"
-    }
-  ],
-
-  impactFactors: {
-    // Environmental Life Cycle Assessment (LCA) averages per unit (based on UN E-waste Monitor & Apple LCA reports)
-    phone: {
-      manufacturingCo2Kg: 65,
-      repairCo2Kg: 4.5,
-      ewasteGrams: 190,
-      cobaltGrams: 12,
-      lithiumGrams: 3.5,
-      goldMg: 35,
-      avgRepairSavingsUsd: 650
-    },
-    laptop: {
-      manufacturingCo2Kg: 220,
-      repairCo2Kg: 12.0,
-      ewasteGrams: 1850,
-      cobaltGrams: 45,
-      lithiumGrams: 18,
-      goldMg: 220,
-      avgRepairSavingsUsd: 850
-    },
-    tablet: {
-      manufacturingCo2Kg: 95,
-      repairCo2Kg: 6.0,
-      ewasteGrams: 480,
-      cobaltGrams: 22,
-      lithiumGrams: 7.0,
-      goldMg: 75,
-      avgRepairSavingsUsd: 320
-    }
-  }
+  ]
 };
 
-window.CIRCULAR_DATA = CIRCULAR_DATA;
+// Make available globally
+window.TANKER_BUDDY_DATA = TANKER_BUDDY_DATA;

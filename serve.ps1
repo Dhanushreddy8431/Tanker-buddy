@@ -5,8 +5,8 @@ $listener.Prefixes.Add($prefix)
 
 try {
     $listener.Start()
-    Write-Host "CIRCULAR Web Server running at: $prefix"
-    Write-Host "Challenge: IMX26-PS07 - CEDA-EPS (Design Electronics for Repair, Reuse & Recovery)"
+    Write-Host "Tanker Buddy Web Server running at: $prefix"
+    Write-Host "Bangalore's Traceable & Softened Water Infrastructure Platform"
     Start-Process $prefix
 
     while ($listener.IsListening) {

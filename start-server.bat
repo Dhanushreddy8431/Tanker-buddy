@@ -1,8 +1,8 @@
 @echo off
-title CIRCULAR - IMX26-PS07 CEDA-EPS
+title Tanker Buddy - Bangalore's Clean Water Infrastructure Platform
 echo ========================================================
-echo   CIRCULAR: Design Electronics for Repair & Reuse
-echo   Challenge: IMX26-PS07 - CEDA-EPS
+echo   Tanker Buddy: Traceable & Softened Water Infrastructure
+echo   Bengaluru Municipal Utility Platform
 echo   Open in Browser: http://localhost:8080/
 echo ========================================================
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0serve.ps1"
